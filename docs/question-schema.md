@@ -20,15 +20,22 @@
 | `id` | string | ○ | 一意なID。`<category>-NNN` 形式(例: `github-001`)。 |
 | `category` | string | ○ | カテゴリ名。`GitHub` / `Salesforce構築の裏側` / `AIの理解と活用` / `AI DXコンサル実務` のいずれか。 |
 | `subtopic` | string | ○ | カテゴリ内の小分類(例: `ブランチ運用`)。 |
+| `key_concept` | string | ○ | その問題が扱う概念の「ひと言定義」(40字以内)。`diagram`のキャプションと
+同内容にする。例: 「origin/mainは、リモートの状態をローカルに写した影」。 |
 | `question` | string | ○ | 設問文。 |
 | `choices` | array(4件) | ○ | 選択肢。各要素は下記「choice要素」参照。ちょうど4件。 |
 | `answer_index` | number | ○ | 正解の選択肢のインデックス(0始まり、0〜3)。 |
-| `explanation` | string | ○ | 正解の理由の解説文。各`choice`側の`why_right`/`why_wrong`と重複してよいが、
-本フィールドは設問全体としてのまとめの解説とする。 |
+| `explanation` | string | ○ | `why_right`の言い換えではなく、`key_concept`を一段深く説明する「仕組み」の
+解説(2〜4文)。選択肢の正誤判定に必要な理由付けは各choiceの`why_right`/`why_wrong`側に書き、
+本フィールドでは重複させず、概念そのものの成り立ち・メカニズムを掘り下げる。 |
 | `diagram` | string | ○ | 解説に添える静止SVGの文字列(`<svg ...>...</svg>`)。図解の型は
-「箱2〜3個+矢印+ラベル+ひと言キャプション」に限定し、要素を増やさない。 |
-| `salesforce_note` | string | 任意 | 「Salesforce構築ではここで出会う」という1行。無い場合はフィールド自体を省略する
-(空文字列を入れない)。 |
+「箱2〜3個・矢印1〜3本・ラベル3個以内・キャプション1文(`key_concept`と同内容)」に限定し、
+要素を増やさない。 |
+| `practice_note` | string | ○ | ユーザーの実運用(ループエンジニアリング・Salesforce構築)の
+どこでこの概念に出会うかを1〜2文で書く。一般論ではなく、`loop-engineering-hub`の
+`CLAUDE.md`・`prompts/`・`skill-src/salesforce-trial-builder/references/setup_gotchas.md`等に
+記録された実例を引用し、出典ファイル名(節があれば節名も)を末尾に括弧で添える。該当する実例が
+見つからない場合は「実例未確認」と書き、省略しない。 |
 | `difficulty` | number | ○ | 難易度。1〜3の整数(1=易・3=難)。 |
 
 ## choice要素のフィールド
@@ -49,6 +56,8 @@
 - `answer_index` は0〜3の範囲内で、`choices[answer_index]` が `why_right` を持つ要素と一致すること。
 - `answer_index` 以外の3要素は `why_wrong` を持つこと。
 - `id` はファイル内で重複しないこと。カテゴリをまたいだ重複も避ける。
+- `key_concept` は40字以内。`diagram`内のキャプション文と同内容にする。
+- `practice_note` は必須。実例を引用できない場合も省略せず「実例未確認」と明記する。
 
 ## 参照元
 
