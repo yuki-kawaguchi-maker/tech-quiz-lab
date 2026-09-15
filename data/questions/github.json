@@ -1,0 +1,87 @@
+[
+  {
+    "id": "github-001",
+    "category": "GitHub",
+    "subtopic": "リモート操作(fetch/pull)",
+    "question": "リモートリポジトリの変更を取得したいが、内容を確認してから取り込むかどうかを自分で判断したい。まず実行すべきコマンドはどれか。",
+    "choices": [
+      {
+        "text": "git pull",
+        "why_wrong": "fetchしてから自動でmergeまで行ってしまうため、内容を確認する前に作業ブランチへ反映されてしまう。「取得」と「取り込み」を1コマンドで済ませたい場合の操作であり、確認したい今回の要件には合わない。"
+      },
+      {
+        "text": "git fetch",
+        "why_right": "リモート追跡ブランチ(origin/main等)だけを更新し、自分の作業ブランチには一切手を加えない。取得した内容を確認してから、必要ならmergeやrebaseで取り込むという2段階の操作ができる。"
+      },
+      {
+        "text": "git clone",
+        "why_wrong": "リポジトリ全体を新規に複製するコマンドで、既に手元にあるローカルリポジトリを最新化する用途には使わない。初回の入手と、既存リポジトリの更新を混同した選択肢。"
+      },
+      {
+        "text": "git merge origin/main",
+        "why_wrong": "fetchで取得した追跡ブランチの内容を作業ブランチに取り込む操作であり、リモートから最新情報を取得する前提の操作。fetchをまだ実行していない状態では、追跡ブランチ自体が最新化されていない。"
+      }
+    ],
+    "answer_index": 1,
+    "explanation": "git fetchはリモート追跡ブランチだけを更新し、作業ブランチには影響しない。取得した内容を確認してから、mergeやrebaseで取り込むかを判断できる。一方git pullはfetchとmergeを1コマンドで行うため、確認の余地なく作業ブランチに反映されてしまう。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git fetchはリモート追跡ブランチのみ更新し、作業ブランチには影響しないことを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70\" y=\"75\" text-anchor=\"middle\" font-size=\"13\" fill=\"currentColor\">リモート</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow1)\"/><text x=\"165\" y=\"58\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git fetch</text><rect x=\"210\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"270\" y=\"70\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">追跡ブランチ</text><text x=\"270\" y=\"85\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(origin/main)</text><defs><marker id=\"arrow1\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">fetchは追跡ブランチだけ更新。作業ブランチは変わらない</text></svg>",
+    "salesforce_note": "Salesforce構築でもSFDXでorgの変更を確認せずpullすると、意図しない上書きが起きうる。fetch相当の「確認してから取り込む」動きが安全という点は共通する。",
+    "difficulty": 1
+  },
+  {
+    "id": "github-002",
+    "category": "GitHub",
+    "subtopic": "ブランチ運用(rebase/merge)",
+    "question": "featureブランチをmainの最新に追従させたいが、コミット履歴を1本の直線に保ち、マージコミットによる分岐点を作りたくない。featureブランチ上で実行すべき操作はどれか。",
+    "choices": [
+      {
+        "text": "git merge main",
+        "why_wrong": "mainの変更をfeatureに取り込むこと自体はできるが、マージコミットが作られ、mainとfeatureの分岐点がそのまま履歴に残る。「直線に保ちたい」という要件に反する。"
+      },
+      {
+        "text": "git rebase main",
+        "why_right": "featureブランチのコミット群を、mainの最新コミットの上に付け替える。分岐点が作られず、コミット履歴が1本の直線になる。"
+      },
+      {
+        "text": "git cherry-pick <コミット>",
+        "why_wrong": "特定の1コミットだけを別ブランチに移植するコマンドで、ブランチ全体をまとめて最新に追従させる操作ではない。個別コミットの移植とブランチ全体の追従を混同した選択肢。"
+      },
+      {
+        "text": "git reset --hard main",
+        "why_wrong": "featureブランチの内容をmainの状態に強制的に置き換えてしまい、featureで積み上げた独自のコミットが失われる。「追従」ではなく「上書き」になってしまう。"
+      }
+    ],
+    "answer_index": 1,
+    "explanation": "git rebaseはfeatureブランチのコミットをmainの最新コミットの上に付け替えるため、mainとfeatureの分岐点が無くなり履歴が直線になる。git mergeはマージコミットを作るため分岐点が残る点が違う。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git rebaseによってfeatureのコミットがmainの先端に付け替わり、履歴が直線になることを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70\" y=\"70\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">main</text><text x=\"70\" y=\"85\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(最新)</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow2)\"/><text x=\"165\" y=\"58\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git rebase</text><rect x=\"210\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"270\" y=\"70\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">feature</text><text x=\"270\" y=\"85\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(付け替え後)</text><defs><marker id=\"arrow2\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">分岐点をmainの先端に移動、履歴が直線になる</text></svg>",
+    "difficulty": 2
+  },
+  {
+    "id": "github-003",
+    "category": "GitHub",
+    "subtopic": "リポジトリ複製(fork/clone)",
+    "question": "自分に書き込み権限が無いOSSプロジェクトに、プルリクエストを送って貢献したい。まずGitHub上で行うべき操作はどれか。",
+    "choices": [
+      {
+        "text": "本家リポジトリをgit cloneしてローカルに複製する",
+        "why_wrong": "ローカルには複製できるが、GitHub上に自分名義のリポジトリができるわけではなく、本家に直接pushする権限もないため、変更を送る先が無い。"
+      },
+      {
+        "text": "GitHub上で本家リポジトリをforkし、自分名義のリポジトリをcloneする",
+        "why_right": "forkによりGitHub上に自分の権限で書き込める複製ができ、そこにローカルからpushしてから本家へプルリクエストを送れる。"
+      },
+      {
+        "text": "本家リポジトリ内でgit branchして新しいブランチを作る",
+        "why_wrong": "本家への書き込み権限が無ければ、そもそも本家リポジトリ上に新しいブランチを作成すること自体ができない。権限の有無を考慮していない選択肢。"
+      },
+      {
+        "text": "git remote addで本家リポジトリをリモートとして追加する",
+        "why_wrong": "リモートとして追加してもpush権限が無ければ変更を送信できず、fork相当の「自分の権限で書き込める複製」にはならない。"
+      }
+    ],
+    "answer_index": 1,
+    "explanation": "forkはGitHub上に自分の権限で操作できる複製を作る操作で、cloneはその複製をローカルに持ってくる操作。書き込み権限が無い本家に直接pushはできないため、fork→cloneの順で自分名義のリポジトリを経由する必要がある。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"forkでGitHub上に自分名義のコピーを作り、そこからローカルにcloneすることを示す図\"><rect x=\"5\" y=\"50\" width=\"100\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"55\" y=\"70\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">本家</text><text x=\"55\" y=\"85\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">リポジトリ</text><line x1=\"105\" y1=\"70\" x2=\"160\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow3)\"/><text x=\"132\" y=\"58\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">fork</text><rect x=\"165\" y=\"50\" width=\"100\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"215\" y=\"70\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">自分名義</text><text x=\"215\" y=\"85\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(GitHub)</text><line x1=\"265\" y1=\"70\" x2=\"320\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow3)\"/><text x=\"292\" y=\"58\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">clone</text><defs><marker id=\"arrow3\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">forkはGitHub上のコピー、cloneはローカルへの複製</text></svg>",
+    "difficulty": 1
+  }
+]
