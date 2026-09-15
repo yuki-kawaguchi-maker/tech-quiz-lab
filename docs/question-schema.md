@@ -29,8 +29,8 @@
 解説(2〜4文)。選択肢の正誤判定に必要な理由付けは各choiceの`why_right`/`why_wrong`側に書き、
 本フィールドでは重複させず、概念そのものの成り立ち・メカニズムを掘り下げる。 |
 | `diagram` | string | ○ | 解説に添える静止SVGの文字列(`<svg ...>...</svg>`)。図解の型は
-「箱2〜3個・矢印1〜3本・ラベル3個以内・キャプション1文(`key_concept`と同内容)」に限定し、
-要素を増やさない。 |
+「箱2〜3個(各箱に名前を付ける。箱の名前はラベルに数えない)・矢印1〜3本・矢印ラベル3個以内・
+キャプション1文(`key_concept`と同内容)」に限定し、要素を増やさない。 |
 | `practice_note` | string | ○ | ユーザーの実運用(ループエンジニアリング・Salesforce構築)の
 どこでこの概念に出会うかを1〜2文で書く。一般論ではなく、`loop-engineering-hub`の
 `CLAUDE.md`・`prompts/`・`skill-src/salesforce-trial-builder/references/setup_gotchas.md`等に

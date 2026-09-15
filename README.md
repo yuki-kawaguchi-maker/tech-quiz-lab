@@ -28,9 +28,9 @@
 新しいカテゴリ、または既存カテゴリへの追加問題をバッチ生成するときは、次の順で進める。
 
 1. **スキーマを確認する**: `docs/question-schema.md` を読み、フィールド構成
-   (`id`/`category`/`subtopic`/`question`/`choices`/`answer_index`/`explanation`/
-   `diagram`/`salesforce_note`(任意)/`difficulty`)を守る。スキーマ自体の変更が
-   必要な場合は、データ作成より先に `docs/question-schema.md` を改訂する。
+   (`id`/`category`/`subtopic`/`key_concept`/`question`/`choices`/`answer_index`/
+   `explanation`/`diagram`/`practice_note`/`difficulty`、いずれも必須)を守る。
+   スキーマ自体の変更が必要な場合は、データ作成より先に `docs/question-schema.md` を改訂する。
 2. **出題対象を決める**: 対象カテゴリと小分類(`subtopic`)の範囲、目標問題数を決める。
    既存の `id`(`<category>-NNN`)と重複しないよう、採番を確認する。
 3. **問題を作成する**: 1問ごとに、正解の選択肢には `why_right`、誤答の選択肢
