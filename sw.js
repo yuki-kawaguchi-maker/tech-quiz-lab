@@ -1,7 +1,7 @@
 /* Tech Quiz Lab service worker */
 "use strict";
 
-var CACHE_VERSION = "tq-cache-v5";
+var CACHE_VERSION = "tq-cache-v6";
 
 var PRECACHE_URLS = [
   "./",
@@ -34,7 +34,9 @@ self.addEventListener("activate", function (event) {
 });
 
 function isNetworkFirstDataRequest(url) {
-  return url.pathname.indexOf("/data/questions/") !== -1 || url.pathname.indexOf("/data/lessons/") !== -1;
+  return url.pathname.indexOf("/data/questions/") !== -1
+    || url.pathname.indexOf("/data/lessons/") !== -1
+    || /\/data\/curriculum\.json$/.test(url.pathname);
 }
 
 function isAppShellRequest(url) {

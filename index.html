@@ -343,6 +343,7 @@
       <p id="streak-text"></p>
       <button type="button" id="zukan-link-btn" class="secondary-muted">仕組み図鑑を見る</button>
       <button type="button" id="textbook-link-btn" class="secondary-muted">教科書を見る</button>
+      <button type="button" id="learning-map-link-btn" class="secondary-muted">学びの地図を見る</button>
     </div>
 
     <section id="stats-box" hidden>
@@ -443,6 +444,14 @@
     <p class="quiz-meta" id="textbook-unit-summary"></p>
     <div id="textbook-unit-cards"></div>
     <button type="button" id="textbook-unit-back-btn" class="secondary-muted back-btn">教科書に戻る</button>
+  </main>
+
+  <main id="screen-learning-map" hidden>
+    <h2>学びの地図</h2>
+    <p class="quiz-meta" id="learning-map-overall"></p>
+    <div class="diagram-box" id="learning-map-svg"></div>
+    <p class="quiz-meta" id="learning-map-status"></p>
+    <button type="button" id="learning-map-back-btn" class="secondary-muted back-btn">トップへ戻る</button>
   </main>
 
   <main id="screen-quiz" hidden>
@@ -552,6 +561,8 @@
     categories: [],
     lessons: [],
     questionUnitTitle: {},
+    curriculum: null,
+    curriculumOrderedAvailableIds: [],
     progress: loadProgress(),
     pool: [],
     poolIndex: 0,
@@ -582,7 +593,7 @@
   var SCREENS = [
     "screen-top", "screen-quiz", "screen-result", "screen-daily-complete",
     "screen-zukan", "screen-zukan-detail", "screen-lesson-card",
-    "screen-textbook", "screen-textbook-unit"
+    "screen-textbook", "screen-textbook-unit", "screen-learning-map"
   ];
 
   function show(id) {
@@ -861,11 +872,29 @@
     return correct / answered;
   }
 
-  function pickTodayLessonUnit(lessons, progress) {
+  function pickTodayLessonUnit(lessons, progress, orderedIds) {
     if (!lessons || lessons.length === 0) return null;
-    var sorted = lessons.slice().sort(function (a, b) {
+    var byId = {};
+    lessons.forEach(function (u) { byId[u.id] = u; });
+
+    var idFallbackSort = lessons.slice().sort(function (a, b) {
       return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
     });
+
+    var sorted;
+    if (orderedIds && orderedIds.length > 0) {
+      /* カリキュラムの順序(ジャンル順→ユニット順)で並べる。カリキュラムに
+         載っていないユニットがあれば、念のためid順で末尾に追加する */
+      sorted = orderedIds.map(function (id) { return byId[id]; }).filter(Boolean);
+      var covered = {};
+      sorted.forEach(function (u) { covered[u.id] = true; });
+      idFallbackSort.forEach(function (u) {
+        if (!covered[u.id]) sorted.push(u);
+      });
+    } else {
+      sorted = idFallbackSort;
+    }
+
     var learned = {};
     progress.learnedUnits.forEach(function (id) { learned[id] = true; });
     var unlearned = sorted.filter(function (u) { return !learned[u.id]; });
@@ -1028,6 +1057,198 @@
       });
       container.appendChild(btn);
     });
+  }
+
+  function getCurriculumUnitStatus(progress, lessonUnitById, unit) {
+    if (unit.status !== "available") return "planned";
+    var learned = progress.learnedUnits.indexOf(unit.id) !== -1;
+    if (!learned) return "unlearned";
+    var lessonUnit = lessonUnitById[unit.id];
+    if (!lessonUnit) return "learning";
+    var attempts = 0;
+    var correct = 0;
+    lessonUnit.question_ids.forEach(function (id) {
+      var s = progress.questionStats[id];
+      if (s) {
+        attempts += s.attempts;
+        correct += (s.attempts - s.wrong);
+      }
+    });
+    if (attempts >= 5 && correct / attempts >= 0.8) return "mastered";
+    return "learning";
+  }
+
+  var CURRICULUM_STATUS_COLOR = {
+    planned: "var(--color-muted)",
+    unlearned: "var(--color-muted)",
+    learning: "var(--color-active)",
+    mastered: "var(--color-correct)"
+  };
+
+  function truncateLabel(text, maxLen) {
+    var s = String(text);
+    return s.length > maxLen ? s.slice(0, maxLen - 1) + "…" : s;
+  }
+
+  function splitGoalLines(text) {
+    var s = String(text);
+    var mid = Math.floor(s.length / 2);
+    var cut = s.lastIndexOf("、", mid);
+    if (cut === -1) cut = mid;
+    return [s.slice(0, cut + 1), s.slice(cut + 1)];
+  }
+
+  function renderLearningMap() {
+    var svgEl = document.getElementById("learning-map-svg");
+    var overallEl = document.getElementById("learning-map-overall");
+    document.getElementById("learning-map-status").textContent = "";
+
+    if (!state.curriculum) {
+      svgEl.innerHTML = "";
+      overallEl.textContent = "学びの地図を読み込み中、または読み込みに失敗しました。";
+      return;
+    }
+
+    var lessonUnitById = {};
+    state.lessons.forEach(function (u) { lessonUnitById[u.id] = u; });
+
+    var todayUnit = pickTodayLessonUnit(state.lessons, state.progress, state.curriculumOrderedAvailableIds);
+    var todayUnitId = todayUnit ? todayUnit.id : null;
+
+    var W = 380;
+    var spineX = W / 2;
+    var boneHalfLength = 130; /* endX = spineX ± boneHalfLength、両端に安全マージンを残す */
+    var y = 46;
+    var parts = [];
+    var totalUnits = 0;
+    var totalMastered = 0;
+
+    parts.push(
+      '<text x="' + spineX + '" y="18" text-anchor="middle" font-size="12" fill="currentColor">現在</text>'
+    );
+    var spineTopY = 24;
+    var spineLineIndex = parts.length; /* 全ジャンルを貫く背骨は、高さが確定してからここに挿入する */
+
+    state.curriculum.categories.forEach(function (cat, catIndex) {
+      var side = (catIndex % 2 === 0) ? -1 : 1; /* -1=左, 1=右 */
+      var units = cat.units;
+      var bandHeight = units.length * 30 + 46;
+      var startX = spineX;
+      var startY = y + 26;
+      var endX = spineX + side * boneHalfLength;
+      var endY = y + bandHeight - 10;
+
+      var masteredCount = 0;
+      units.forEach(function (u) {
+        var status = getCurriculumUnitStatus(state.progress, lessonUnitById, u);
+        if (status === "mastered") masteredCount++;
+      });
+      totalUnits += units.length;
+      totalMastered += masteredCount;
+
+      var catGroupId = "map-cat-" + cat.id;
+      /* カテゴリ見出しと「習得/全」は常に中央寄せにして、左右どちらの向きでも
+         画面端にはみ出さないようにする */
+      parts.push(
+        '<text x="' + spineX + '" y="' + (y + 2) + '" text-anchor="middle" font-size="12" ' +
+        'font-weight="bold" fill="currentColor">' + escapeXml(truncateLabel(cat.title, 16)) + "</text>"
+      );
+      parts.push(
+        '<text x="' + spineX + '" y="' + (y + 16) + '" text-anchor="middle" font-size="12" ' +
+        'fill="currentColor">習得' + masteredCount + "/全" + units.length + "</text>"
+      );
+      parts.push(
+        '<g class="learning-map-category" id="' + catGroupId + '" data-cat="' + cat.id + '">' +
+        '<line x1="' + startX + '" y1="' + startY + '" x2="' + endX + '" y2="' + endY +
+        '" stroke="currentColor" stroke-width="1.5"/>'
+      );
+
+      units.forEach(function (u, idx) {
+        var t = (idx + 1) / (units.length + 1);
+        var ux = startX + (endX - startX) * t;
+        var uy = startY + (endY - startY) * t;
+        var status = getCurriculumUnitStatus(state.progress, lessonUnitById, u);
+        var color = CURRICULUM_STATUS_COLOR[status];
+        var fill = (status === "unlearned" || status === "planned") ? "var(--color-bg)" : color;
+        var dash = status === "planned" ? ' stroke-dasharray="2,2"' : "";
+        parts.push(
+          '<circle cx="' + ux + '" cy="' + uy + '" r="5" fill="' + fill + '" stroke="' + color +
+          '" stroke-width="1.5"' + dash + '/>'
+        );
+        /* ラベルは丸の真下に中央寄せで置き、画面端に近い位置でもはみ出さないようにする */
+        parts.push(
+          '<text x="' + ux + '" y="' + (uy + 15) + '" text-anchor="middle" font-size="12" ' +
+          'fill="currentColor">' + escapeXml(truncateLabel(u.title, 9)) + "</text>"
+        );
+        if (u.id === todayUnitId) {
+          parts.push(
+            '<circle cx="' + ux + '" cy="' + uy + '" r="8" fill="none" stroke="var(--color-active)" stroke-width="2"/>'
+          );
+        }
+      });
+
+      parts.push("</g>");
+      y += bandHeight + 8;
+    });
+
+    parts.splice(
+      spineLineIndex, 0,
+      '<line x1="' + spineX + '" y1="' + spineTopY + '" x2="' + spineX + '" y2="' + y +
+      '" stroke="currentColor" stroke-width="1.5"/>'
+    );
+
+    y += 20;
+    parts.push(
+      '<line x1="' + spineX + '" y1="' + (y - 20) + '" x2="' + spineX + '" y2="' + y +
+      '" stroke="currentColor" stroke-width="1.5"/>'
+    );
+    y += 20;
+    var goalLines = splitGoalLines(state.curriculum.goal);
+    parts.push(
+      '<rect x="' + (spineX - 165) + '" y="' + (y - 20) + '" width="330" height="46" rx="6" ' +
+      'fill="none" stroke="currentColor" stroke-width="2"/>'
+    );
+    parts.push(
+      '<text x="' + spineX + '" y="' + (y - 2) + '" text-anchor="middle" font-size="12" fill="currentColor">' +
+      escapeXml(goalLines[0]) + "</text>"
+    );
+    parts.push(
+      '<text x="' + spineX + '" y="' + (y + 15) + '" text-anchor="middle" font-size="12" fill="currentColor">' +
+      escapeXml(goalLines[1]) + "</text>"
+    );
+    y += 40;
+
+    var svg = '<svg viewBox="0 0 ' + W + " " + y +
+      '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="学びの地図(フィッシュボーン図)">' +
+      parts.join("") + "</svg>";
+    svgEl.innerHTML = svg;
+
+    var overallPct = totalUnits > 0 ? Math.round((totalMastered / totalUnits) * 100) : 0;
+    overallEl.textContent = "全体の習得率: " + overallPct + "%(" + totalMastered + " / " + totalUnits + "ユニット)";
+
+    state.curriculum.categories.forEach(function (cat) {
+      var el = document.getElementById("map-cat-" + cat.id);
+      if (!el) return;
+      el.style.cursor = "pointer";
+      el.addEventListener("click", function () {
+        var hasAvailable = cat.units.some(function (u) { return u.status === "available"; });
+        if (!hasAvailable) {
+          document.getElementById("learning-map-status").textContent =
+            cat.title + ": 準備中(まだレッスンがありません)";
+          return;
+        }
+        document.getElementById("learning-map-status").textContent = "";
+        renderTextbook();
+        show("screen-textbook");
+      });
+    });
+  }
+
+  function escapeXml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
   }
 
   function renderTopWrong() {
@@ -1483,7 +1704,7 @@
   });
 
   document.getElementById("daily-start-btn").addEventListener("click", function () {
-    var unit = pickTodayLessonUnit(state.lessons, state.progress);
+    var unit = pickTodayLessonUnit(state.lessons, state.progress, state.curriculumOrderedAvailableIds);
     if (!unit) {
       startDailyQuizForUnit(null);
       return;
@@ -1578,6 +1799,16 @@
     show("screen-textbook");
   });
 
+  document.getElementById("learning-map-link-btn").addEventListener("click", function () {
+    renderLearningMap();
+    show("screen-learning-map");
+  });
+
+  bindBackButton("learning-map-back-btn", function () {
+    refreshTopScreen();
+    show("screen-top");
+  });
+
   document.getElementById("setup-form").addEventListener("submit", function (e) {
     e.preventDefault();
     var errorEl = document.getElementById("start-error");
@@ -1645,6 +1876,23 @@
       .catch(function (err) {
         /* レッスンデータが読み込めなくても、従来の「20問」フローで動作を続ける */
         console.warn("lesson data load failed", err);
+      });
+
+    fetch("data/curriculum.json")
+      .then(function (res) { return res.json(); })
+      .then(function (curriculum) {
+        state.curriculum = curriculum;
+        var orderedIds = [];
+        curriculum.categories.forEach(function (cat) {
+          cat.units.forEach(function (unit) {
+            if (unit.status === "available") orderedIds.push(unit.id);
+          });
+        });
+        state.curriculumOrderedAvailableIds = orderedIds;
+      })
+      .catch(function (err) {
+        /* カリキュラムデータが読み込めなくても、学びの地図以外は従来どおり動作する */
+        console.warn("curriculum data load failed", err);
       });
   }
 
@@ -1723,7 +1971,9 @@
     todayStr: todayStr,
     daysBetween: daysBetween,
     pickTodayLessonUnit: pickTodayLessonUnit,
-    unitAccuracy: unitAccuracy
+    unitAccuracy: unitAccuracy,
+    getCurriculumUnitStatus: getCurriculumUnitStatus,
+    renderLearningMap: renderLearningMap
   };
 })();
 </script>

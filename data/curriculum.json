@@ -1,0 +1,244 @@
+{
+  "goal": "AX/DXコンサルとして、AIと一緒に自分で作り・提案し・運用できる",
+  "categories": [
+    {
+      "id": "github",
+      "title": "GitHub",
+      "summary": "変更履歴を安全に管理し、チームでコードを統合する基礎を身につける。",
+      "units": [
+        {
+          "id": "github-u01",
+          "title": "リポジトリとコミット",
+          "status": "available"
+        },
+        {
+          "id": "github-u02",
+          "title": "ブランチとマージ",
+          "status": "available"
+        },
+        {
+          "id": "github-u03",
+          "title": "リモートとfetch・pull・push",
+          "status": "available"
+        },
+        {
+          "id": "github-u04",
+          "title": "fork・clone・プルリクエスト",
+          "status": "available"
+        },
+        {
+          "id": "github-u05",
+          "title": "ステージング・HEAD・取り消し(reset/revert/stash)",
+          "status": "available"
+        }
+      ]
+    },
+    {
+      "id": "web-api",
+      "title": "Web・API・ネットワークの仕組み",
+      "summary": "ブラウザとサーバーの間で何が起きているかを理解し、API連携の土台を作る。",
+      "units": [
+        {
+          "id": "web-api-u01",
+          "title": "HTTPの仕組み",
+          "status": "planned"
+        },
+        {
+          "id": "web-api-u02",
+          "title": "REST APIの仕組み",
+          "status": "planned"
+        },
+        {
+          "id": "web-api-u03",
+          "title": "DNSとプロキシ",
+          "status": "planned"
+        },
+        {
+          "id": "web-api-u04",
+          "title": "API認証(トークン・OAuth)",
+          "status": "planned"
+        },
+        {
+          "id": "web-api-u05",
+          "title": "冪等性とリトライ",
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "database",
+      "title": "データベースの仕組み",
+      "summary": "データをどう構造化し、安全かつ速く読み書きするかの基礎を身につける。",
+      "units": [
+        {
+          "id": "database-u01",
+          "title": "SQLとNoSQL",
+          "status": "planned"
+        },
+        {
+          "id": "database-u02",
+          "title": "トランザクション",
+          "status": "planned"
+        },
+        {
+          "id": "database-u03",
+          "title": "インデックス",
+          "status": "planned"
+        },
+        {
+          "id": "database-u04",
+          "title": "OLTPとOLAP",
+          "status": "planned"
+        },
+        {
+          "id": "database-u05",
+          "title": "スキーマ設計の基本",
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "salesforce",
+      "title": "Salesforce構築の裏側",
+      "summary": "宣言的開発とコードの境界、組織運用の仕組みを理解する。",
+      "units": [
+        {
+          "id": "salesforce-u01",
+          "title": "メタデータとデプロイ",
+          "status": "planned"
+        },
+        {
+          "id": "salesforce-u02",
+          "title": "sf CLIと組織",
+          "status": "planned"
+        },
+        {
+          "id": "salesforce-u03",
+          "title": "JWT接続とOAuthスコープ",
+          "status": "planned"
+        },
+        {
+          "id": "salesforce-u04",
+          "title": "ガバナ制限とトランザクション",
+          "status": "planned"
+        },
+        {
+          "id": "salesforce-u05",
+          "title": "LWCが動く仕組み",
+          "status": "planned"
+        },
+        {
+          "id": "salesforce-u06",
+          "title": "FlexiPageとレコードページ",
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "n8n",
+      "title": "n8nと自動化連携",
+      "summary": "ノーコード自動化ツールで、システム間の連携を組み立てる基礎を身につける。",
+      "units": [
+        {
+          "id": "n8n-u01",
+          "title": "ワークフローとノード",
+          "status": "planned"
+        },
+        {
+          "id": "n8n-u02",
+          "title": "Webhookとトリガー",
+          "status": "planned"
+        },
+        {
+          "id": "n8n-u03",
+          "title": "認証情報とスコープ",
+          "status": "planned"
+        },
+        {
+          "id": "n8n-u04",
+          "title": "エラー処理と再実行",
+          "status": "planned"
+        },
+        {
+          "id": "n8n-u05",
+          "title": "冪等な設計",
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "title": "AIの理解と活用",
+      "summary": "LLMがどう動き、何が得意で何が苦手かを理解し、実務で使いこなす基礎を作る。",
+      "units": [
+        {
+          "id": "ai-u01",
+          "title": "LLMの仕組み",
+          "status": "planned"
+        },
+        {
+          "id": "ai-u02",
+          "title": "コンテキストウィンドウ",
+          "status": "planned"
+        },
+        {
+          "id": "ai-u03",
+          "title": "RAGと埋め込み",
+          "status": "planned"
+        },
+        {
+          "id": "ai-u04",
+          "title": "ツール呼び出しとMCP",
+          "status": "planned"
+        },
+        {
+          "id": "ai-u05",
+          "title": "エージェントとサブエージェント",
+          "status": "planned"
+        },
+        {
+          "id": "ai-u06",
+          "title": "モデルの使い分け",
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "ax-consulting",
+      "title": "AI DXコンサル実務",
+      "summary": "AI導入を「作って終わり」にせず、業務に定着させ成果につなげる実務力を身につける。",
+      "units": [
+        {
+          "id": "ax-consulting-u01",
+          "title": "PoC死の構造",
+          "status": "planned"
+        },
+        {
+          "id": "ax-consulting-u02",
+          "title": "業務プロセス分解",
+          "status": "planned"
+        },
+        {
+          "id": "ax-consulting-u03",
+          "title": "データ整備が先",
+          "status": "planned"
+        },
+        {
+          "id": "ax-consulting-u04",
+          "title": "ROIの立て方",
+          "status": "planned"
+        },
+        {
+          "id": "ax-consulting-u05",
+          "title": "情シスとセキュリティ説得",
+          "status": "planned"
+        },
+        {
+          "id": "ax-consulting-u06",
+          "title": "内製化と伴走の線引き",
+          "status": "planned"
+        }
+      ]
+    }
+  ]
+}
