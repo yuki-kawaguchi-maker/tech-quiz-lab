@@ -1085,9 +1085,37 @@
     mastered: "var(--color-correct)"
   };
 
-  function truncateLabel(text, maxLen) {
+  var CATEGORY_TITLE_LINE_WIDTH = 14; /* 全角換算。これを超えたら2行に折り返す(「…」は使わない) */
+
+  function zenkakuWidth(s) {
+    var w = 0;
+    var str = String(s);
+    for (var i = 0; i < str.length; i++) {
+      w += str.charCodeAt(i) < 128 ? 0.5 : 1;
+    }
+    return w;
+  }
+
+  function wrapCategoryTitle(text, maxWidthPerLine) {
     var s = String(text);
-    return s.length > maxLen ? s.slice(0, maxLen - 1) + "…" : s;
+    if (zenkakuWidth(s) <= maxWidthPerLine) return [s];
+    var w = 0;
+    var splitIndex = s.length;
+    for (var i = 0; i < s.length; i++) {
+      w += s.charCodeAt(i) < 128 ? 0.5 : 1;
+      if (w > maxWidthPerLine) {
+        splitIndex = i;
+        break;
+      }
+    }
+    var delimiters = "・、 ";
+    for (var j = splitIndex; j > 0; j--) {
+      if (delimiters.indexOf(s.charAt(j)) !== -1) {
+        splitIndex = j + 1;
+        break;
+      }
+    }
+    return [s.slice(0, splitIndex), s.slice(splitIndex)];
   }
 
   function splitGoalLines(text) {
@@ -1132,9 +1160,11 @@
     state.curriculum.categories.forEach(function (cat, catIndex) {
       var side = (catIndex % 2 === 0) ? -1 : 1; /* -1=左, 1=右 */
       var units = cat.units;
-      var bandHeight = units.length * 30 + 46;
+      var titleLines = wrapCategoryTitle(cat.title, CATEGORY_TITLE_LINE_WIDTH);
+      var headerExtra = (titleLines.length - 1) * 14; /* 2行に折り返した分だけ縦に広げる */
+      var bandHeight = units.length * 30 + 46 + headerExtra;
       var startX = spineX;
-      var startY = y + 26;
+      var startY = y + 26 + headerExtra;
       var endX = spineX + side * boneHalfLength;
       var endY = y + bandHeight - 10;
 
@@ -1148,13 +1178,16 @@
 
       var catGroupId = "map-cat-" + cat.id;
       /* カテゴリ見出しと「習得/全」は常に中央寄せにして、左右どちらの向きでも
-         画面端にはみ出さないようにする */
+         画面端にはみ出さないようにする。見出しは幅に収まらなければ最大2行に折り返す
+         (「…」は使わない) */
+      titleLines.forEach(function (line, lineIdx) {
+        parts.push(
+          '<text x="' + spineX + '" y="' + (y + 2 + lineIdx * 14) + '" text-anchor="middle" font-size="12" ' +
+          'font-weight="bold" fill="currentColor">' + escapeXml(line) + "</text>"
+        );
+      });
       parts.push(
-        '<text x="' + spineX + '" y="' + (y + 2) + '" text-anchor="middle" font-size="12" ' +
-        'font-weight="bold" fill="currentColor">' + escapeXml(truncateLabel(cat.title, 16)) + "</text>"
-      );
-      parts.push(
-        '<text x="' + spineX + '" y="' + (y + 16) + '" text-anchor="middle" font-size="12" ' +
+        '<text x="' + spineX + '" y="' + (y + 2 + titleLines.length * 14) + '" text-anchor="middle" font-size="12" ' +
         'fill="currentColor">習得' + masteredCount + "/全" + units.length + "</text>"
       );
       parts.push(
@@ -1175,10 +1208,11 @@
           '<circle cx="' + ux + '" cy="' + uy + '" r="5" fill="' + fill + '" stroke="' + color +
           '" stroke-width="1.5"' + dash + '/>'
         );
-        /* ラベルは丸の真下に中央寄せで置き、画面端に近い位置でもはみ出さないようにする */
+        /* ラベルは丸の真下に中央寄せで置き、画面端に近い位置でもはみ出さないようにする。
+           short_title(全角8字以内)をそのまま使い、「…」による機械的な省略はしない */
         parts.push(
           '<text x="' + ux + '" y="' + (uy + 15) + '" text-anchor="middle" font-size="12" ' +
-          'fill="currentColor">' + escapeXml(truncateLabel(u.title, 9)) + "</text>"
+          'fill="currentColor">' + escapeXml(u.short_title) + "</text>"
         );
         if (u.id === todayUnitId) {
           parts.push(

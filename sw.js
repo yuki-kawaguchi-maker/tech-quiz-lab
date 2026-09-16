@@ -1,7 +1,7 @@
 /* Tech Quiz Lab service worker */
 "use strict";
 
-var CACHE_VERSION = "tq-cache-v6";
+var CACHE_VERSION = "tq-cache-v7";
 
 var PRECACHE_URLS = [
   "./",

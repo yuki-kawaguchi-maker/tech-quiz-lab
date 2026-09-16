@@ -9,27 +9,32 @@
         {
           "id": "github-u01",
           "title": "リポジトリとコミット",
-          "status": "available"
+          "status": "available",
+          "short_title": "リポジトリ"
         },
         {
           "id": "github-u02",
           "title": "ブランチとマージ",
-          "status": "available"
+          "status": "available",
+          "short_title": "ブランチ"
         },
         {
           "id": "github-u03",
           "title": "リモートとfetch・pull・push",
-          "status": "available"
+          "status": "available",
+          "short_title": "fetch・push"
         },
         {
           "id": "github-u04",
           "title": "fork・clone・プルリクエスト",
-          "status": "available"
+          "status": "available",
+          "short_title": "fork・PR"
         },
         {
           "id": "github-u05",
           "title": "ステージング・HEAD・取り消し(reset/revert/stash)",
-          "status": "available"
+          "status": "available",
+          "short_title": "HEADと取消"
         }
       ]
     },
@@ -41,27 +46,32 @@
         {
           "id": "web-api-u01",
           "title": "HTTPの仕組み",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "HTTPの仕組み"
         },
         {
           "id": "web-api-u02",
           "title": "REST APIの仕組み",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "REST APIの仕組み"
         },
         {
           "id": "web-api-u03",
           "title": "DNSとプロキシ",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "DNSとプロキシ"
         },
         {
           "id": "web-api-u04",
           "title": "API認証(トークン・OAuth)",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "API認証"
         },
         {
           "id": "web-api-u05",
           "title": "冪等性とリトライ",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "冪等性とリトライ"
         }
       ]
     },
@@ -73,27 +83,32 @@
         {
           "id": "database-u01",
           "title": "SQLとNoSQL",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "SQLとNoSQL"
         },
         {
           "id": "database-u02",
           "title": "トランザクション",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "トランザクション"
         },
         {
           "id": "database-u03",
           "title": "インデックス",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "インデックス"
         },
         {
           "id": "database-u04",
           "title": "OLTPとOLAP",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "OLTPとOLAP"
         },
         {
           "id": "database-u05",
           "title": "スキーマ設計の基本",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "スキーマ設計"
         }
       ]
     },
@@ -105,32 +120,38 @@
         {
           "id": "salesforce-u01",
           "title": "メタデータとデプロイ",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "メタデータ"
         },
         {
           "id": "salesforce-u02",
           "title": "sf CLIと組織",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "sf CLIと組織"
         },
         {
           "id": "salesforce-u03",
           "title": "JWT接続とOAuthスコープ",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "JWT接続"
         },
         {
           "id": "salesforce-u04",
           "title": "ガバナ制限とトランザクション",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "ガバナ制限"
         },
         {
           "id": "salesforce-u05",
           "title": "LWCが動く仕組み",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "LWCが動く仕組み"
         },
         {
           "id": "salesforce-u06",
           "title": "FlexiPageとレコードページ",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "FlexiPage"
         }
       ]
     },
@@ -142,27 +163,32 @@
         {
           "id": "n8n-u01",
           "title": "ワークフローとノード",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "ワークフロー"
         },
         {
           "id": "n8n-u02",
           "title": "Webhookとトリガー",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "Webhook"
         },
         {
           "id": "n8n-u03",
           "title": "認証情報とスコープ",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "認証情報"
         },
         {
           "id": "n8n-u04",
           "title": "エラー処理と再実行",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "エラー処理"
         },
         {
           "id": "n8n-u05",
           "title": "冪等な設計",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "冪等な設計"
         }
       ]
     },
@@ -174,32 +200,38 @@
         {
           "id": "ai-u01",
           "title": "LLMの仕組み",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "LLMの仕組み"
         },
         {
           "id": "ai-u02",
           "title": "コンテキストウィンドウ",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "コンテキスト"
         },
         {
           "id": "ai-u03",
           "title": "RAGと埋め込み",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "RAGと埋め込み"
         },
         {
           "id": "ai-u04",
           "title": "ツール呼び出しとMCP",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "MCP呼び出し"
         },
         {
           "id": "ai-u05",
           "title": "エージェントとサブエージェント",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "エージェント"
         },
         {
           "id": "ai-u06",
           "title": "モデルの使い分け",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "モデルの使い分け"
         }
       ]
     },
@@ -211,32 +243,38 @@
         {
           "id": "ax-consulting-u01",
           "title": "PoC死の構造",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "PoC死の構造"
         },
         {
           "id": "ax-consulting-u02",
           "title": "業務プロセス分解",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "業務プロセス分解"
         },
         {
           "id": "ax-consulting-u03",
           "title": "データ整備が先",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "データ整備が先"
         },
         {
           "id": "ax-consulting-u04",
           "title": "ROIの立て方",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "ROIの立て方"
         },
         {
           "id": "ax-consulting-u05",
           "title": "情シスとセキュリティ説得",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "セキュリティ説得"
         },
         {
           "id": "ax-consulting-u06",
           "title": "内製化と伴走の線引き",
-          "status": "planned"
+          "status": "planned",
+          "short_title": "内製化と伴走"
         }
       ]
     }

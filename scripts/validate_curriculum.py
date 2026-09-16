@@ -9,6 +9,12 @@ import json
 import sys
 
 VALID_STATUS = {"planned", "available"}
+SHORT_TITLE_MAX_WIDTH = 8
+
+
+def zenkaku_width(s):
+    """半角英数字・記号を0.5字、それ以外(全角文字)を1字として幅を計算する。"""
+    return sum(0.5 if ord(ch) < 128 else 1.0 for ch in s)
 
 
 def load_available_lesson_unit_ids():
@@ -64,9 +70,16 @@ def main():
         for unit in units:
             total_units += 1
             uid = unit.get("id", "<id無し>")
-            for field in ("id", "title", "status"):
+            for field in ("id", "title", "short_title", "status"):
                 if field not in unit:
                     errors.append(f"{path}:{cid}:{uid}: unit必須フィールド'{field}'が無い")
+            if "short_title" in unit:
+                w = zenkaku_width(unit["short_title"])
+                if w > SHORT_TITLE_MAX_WIDTH:
+                    errors.append(
+                        f"{path}:{cid}:{uid}: short_titleが全角{SHORT_TITLE_MAX_WIDTH}字を超えている"
+                        f"(換算{w}字: {unit['short_title']!r})"
+                    )
             if "id" in unit:
                 if unit["id"] in seen_unit_ids:
                     errors.append(f"{path}:{cid}:{uid}: unit idが重複している")
