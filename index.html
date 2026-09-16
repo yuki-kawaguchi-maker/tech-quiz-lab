@@ -276,6 +276,34 @@
     font-size: 0.75rem;
     margin-top: 4px;
   }
+  .lesson-diagram [data-step] {
+    transition: opacity 0.5s ease, transform 0.5s ease, stroke-dashoffset 0.5s ease;
+  }
+  .lesson-diagram [data-anim="a"][data-step] { opacity: 0; }
+  .lesson-diagram [data-anim="a"][data-step].revealed { opacity: 1; }
+  .lesson-diagram [data-anim="c"][data-step] { transform: translate(0, 0); }
+  .lesson-diagram [data-anim="c"][data-step].revealed { transform: translate(var(--tx), var(--ty)); }
+  .lesson-diagram [data-anim="b"][data-step].revealed { stroke-dashoffset: 0 !important; }
+  @media (prefers-reduced-motion: reduce) {
+    .lesson-diagram [data-step] { transition: none; }
+  }
+  #lesson-card-diagram { cursor: pointer; }
+  #lesson-card-step-text {
+    min-height: 1.3em;
+    color: var(--color-active);
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+  .textbook-category-header {
+    font-weight: bold;
+    margin: 12px 0 6px;
+  }
+  .textbook-unit-item, .textbook-card-item {
+    text-align: left;
+  }
+  .textbook-unit-item.learned {
+    border-color: var(--color-correct);
+  }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -287,7 +315,7 @@
     <p id="loading-message">問題データを読み込み中...</p>
 
     <div id="daily-loop-box" hidden>
-      <button type="button" class="primary" id="daily-start-btn">今日の20問を始める</button>
+      <button type="button" class="primary" id="daily-start-btn">今日のレッスンを始める</button>
       <p id="welcome-back-message" hidden></p>
       <div id="progress-gauge-box">
         <p id="gauge-text"></p>
@@ -295,6 +323,7 @@
       </div>
       <p id="streak-text"></p>
       <button type="button" id="zukan-link-btn" class="secondary-muted">仕組み図鑑を見る</button>
+      <button type="button" id="textbook-link-btn" class="secondary-muted">教科書を見る</button>
     </div>
 
     <section id="stats-box" hidden>
@@ -365,9 +394,42 @@
     <button type="button" id="zukan-detail-back-btn" class="secondary-muted back-btn">図鑑に戻る</button>
   </main>
 
+  <main id="screen-lesson-card" hidden>
+    <p class="quiz-meta" id="lesson-unit-title"></p>
+    <p class="quiz-meta" id="lesson-card-progress"></p>
+    <h2 id="lesson-card-title"></h2>
+    <div class="diagram-box lesson-diagram" id="lesson-card-diagram"></div>
+    <p id="lesson-card-step-text"></p>
+    <div class="key-concept-box" id="lesson-card-key-concept"></div>
+    <p id="lesson-card-body"></p>
+    <div class="practice-note-box" id="lesson-card-practice-note" hidden></div>
+    <button type="button" id="lesson-next-step-btn" class="primary">次の段階</button>
+    <button type="button" id="lesson-replay-btn" class="secondary-muted" hidden>もう一度見る</button>
+    <button type="button" id="lesson-next-card-btn" class="primary" hidden>次のカードへ</button>
+    <button type="button" id="lesson-finish-btn" class="primary" hidden>このユニットの問題を含む20問へ</button>
+    <button type="button" id="lesson-skip-btn" class="secondary-muted" hidden>レッスンを飛ばして20問へ</button>
+    <button type="button" id="lesson-back-btn" class="secondary-muted back-btn" hidden>戻る</button>
+  </main>
+
+  <main id="screen-textbook" hidden>
+    <h2>教科書</h2>
+    <p class="quiz-meta">ユニットをタップすると、カードを自由に読めます。✓は学習済みのユニットです。</p>
+    <div id="textbook-content"></div>
+    <button type="button" id="textbook-back-btn" class="secondary-muted back-btn">トップへ戻る</button>
+  </main>
+
+  <main id="screen-textbook-unit" hidden>
+    <p class="quiz-meta" id="textbook-unit-category"></p>
+    <h2 id="textbook-unit-title"></h2>
+    <p class="quiz-meta" id="textbook-unit-summary"></p>
+    <div id="textbook-unit-cards"></div>
+    <button type="button" id="textbook-unit-back-btn" class="secondary-muted back-btn">教科書に戻る</button>
+  </main>
+
   <main id="screen-quiz" hidden>
     <p class="quiz-meta" id="quiz-progress"></p>
     <p class="quiz-meta" id="quiz-category"></p>
+    <p class="quiz-meta" id="quiz-unit-title" hidden></p>
     <div class="diagram-box" id="quiz-diagram" hidden></div>
     <p class="question-text" id="quiz-question"></p>
     <div id="quiz-choices"></div>
@@ -400,6 +462,7 @@
       questionStats: {},
       everCorrect: [],
       answerLog: [],
+      learnedUnits: [],
       dailyLoop: {
         startDate: null,
         completedDates: [],
@@ -426,6 +489,7 @@
         questionStats: parsed.questionStats || base.questionStats,
         everCorrect: Array.isArray(parsed.everCorrect) ? parsed.everCorrect : base.everCorrect,
         answerLog: Array.isArray(parsed.answerLog) ? parsed.answerLog : base.answerLog,
+        learnedUnits: Array.isArray(parsed.learnedUnits) ? parsed.learnedUnits : base.learnedUnits,
         dailyLoop: parsed.dailyLoop || base.dailyLoop
       };
     } catch (e) {
@@ -467,6 +531,8 @@
   var state = {
     questions: [],
     categories: [],
+    lessons: [],
+    questionUnitTitle: {},
     progress: loadProgress(),
     pool: [],
     poolIndex: 0,
@@ -476,7 +542,11 @@
     selectedIndex: null,
     guessedPressed: false,
     isDailySession: false,
-    zukanCurrentId: null
+    zukanCurrentId: null,
+    lessonUnit: null,
+    lessonCardIndex: 0,
+    lessonStep: 0,
+    lessonOrigin: null
   };
 
   function shuffle(array) {
@@ -490,7 +560,11 @@
     return a;
   }
 
-  var SCREENS = ["screen-top", "screen-quiz", "screen-result", "screen-daily-complete", "screen-zukan", "screen-zukan-detail"];
+  var SCREENS = [
+    "screen-top", "screen-quiz", "screen-result", "screen-daily-complete",
+    "screen-zukan", "screen-zukan-detail", "screen-lesson-card",
+    "screen-textbook", "screen-textbook-unit"
+  ];
 
   function show(id) {
     SCREENS.forEach(function (s) {
@@ -639,19 +713,34 @@
 
     var everCorrectSet = {};
     state.progress.everCorrect.forEach(function (id) { everCorrectSet[id] = true; });
+    var learnedSet = {};
+    state.progress.learnedUnits.forEach(function (id) { learnedSet[id] = true; });
 
     var byCategory = {};
     state.questions.forEach(function (q) {
       if (!byCategory[q.category]) byCategory[q.category] = [];
       byCategory[q.category].push(q);
     });
+    var unitsByCategory = {};
+    state.lessons.forEach(function (u) {
+      if (!unitsByCategory[u.category]) unitsByCategory[u.category] = [];
+      unitsByCategory[u.category].push(u);
+    });
+    var categories = {};
+    Object.keys(byCategory).forEach(function (c) { categories[c] = true; });
+    Object.keys(unitsByCategory).forEach(function (c) { categories[c] = true; });
 
-    Object.keys(byCategory).forEach(function (cat) {
-      var list = byCategory[cat];
-      var unlockedCount = list.filter(function (q) { return everCorrectSet[q.id]; }).length;
+    Object.keys(categories).forEach(function (cat) {
+      var list = byCategory[cat] || [];
+      var units = unitsByCategory[cat] || [];
+      var cardCount = units.reduce(function (sum, u) { return sum + u.cards.length; }, 0);
+      var unlockedQuestionCount = list.filter(function (q) { return everCorrectSet[q.id]; }).length;
+      var unlockedCardCount = units.reduce(function (sum, u) {
+        return sum + (learnedSet[u.id] ? u.cards.length : 0);
+      }, 0);
 
       var summaryP = document.createElement("p");
-      summaryP.textContent = cat + ": " + unlockedCount + " / " + list.length + "個";
+      summaryP.textContent = cat + ": " + (unlockedQuestionCount + unlockedCardCount) + " / " + (list.length + cardCount) + "個";
       summaryEl.appendChild(summaryP);
 
       var header = document.createElement("div");
@@ -661,30 +750,63 @@
 
       var grid = document.createElement("div");
       grid.className = "zukan-grid";
+
+      units.forEach(function (unit) {
+        unit.cards.forEach(function (card, idx) {
+          if (learnedSet[unit.id]) {
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "zukan-item";
+            var svgWrap = document.createElement("div");
+            svgWrap.className = "zukan-svg";
+            svgWrap.innerHTML = trimDiagram(card.diagram, card.key_concept);
+            var kc = document.createElement("div");
+            kc.className = "zukan-kc";
+            kc.textContent = card.key_concept + "(教科書)";
+            btn.appendChild(svgWrap);
+            btn.appendChild(kc);
+            btn.addEventListener("click", function () { openZukanLessonCard(unit, idx); });
+            grid.appendChild(btn);
+          } else {
+            var locked = document.createElement("div");
+            locked.className = "zukan-item locked";
+            locked.textContent = "?";
+            grid.appendChild(locked);
+          }
+        });
+      });
+
       list.forEach(function (q) {
         if (everCorrectSet[q.id]) {
-          var btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "zukan-item";
-          var svgWrap = document.createElement("div");
-          svgWrap.className = "zukan-svg";
-          svgWrap.innerHTML = trimDiagram(q.diagram, q.key_concept);
-          var kc = document.createElement("div");
-          kc.className = "zukan-kc";
-          kc.textContent = q.key_concept;
-          btn.appendChild(svgWrap);
-          btn.appendChild(kc);
-          btn.addEventListener("click", function () { openZukanDetail(q.id); });
-          grid.appendChild(btn);
+          var qbtn = document.createElement("button");
+          qbtn.type = "button";
+          qbtn.className = "zukan-item";
+          var qSvgWrap = document.createElement("div");
+          qSvgWrap.className = "zukan-svg";
+          qSvgWrap.innerHTML = trimDiagram(q.diagram, q.key_concept);
+          var qkc = document.createElement("div");
+          qkc.className = "zukan-kc";
+          qkc.textContent = q.key_concept;
+          qbtn.appendChild(qSvgWrap);
+          qbtn.appendChild(qkc);
+          qbtn.addEventListener("click", function () { openZukanDetail(q.id); });
+          grid.appendChild(qbtn);
         } else {
-          var locked = document.createElement("div");
-          locked.className = "zukan-item locked";
-          locked.textContent = "?";
-          grid.appendChild(locked);
+          var qlocked = document.createElement("div");
+          qlocked.className = "zukan-item locked";
+          qlocked.textContent = "?";
+          grid.appendChild(qlocked);
         }
       });
       contentEl.appendChild(grid);
     });
+  }
+
+  function openZukanLessonCard(unit, cardIndex) {
+    state.lessonUnit = unit;
+    state.lessonCardIndex = cardIndex;
+    state.lessonOrigin = "zukan";
+    renderLessonCard();
   }
 
   function openZukanDetail(id) {
@@ -696,6 +818,197 @@
     document.getElementById("zukan-detail-explanation").textContent = q.explanation;
     document.getElementById("zukan-detail-practice-note").textContent = q.practice_note;
     show("screen-zukan-detail");
+  }
+
+  function prefersReducedMotion() {
+    try {
+      return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function unitAccuracy(progress, unit) {
+    var answered = 0;
+    var correct = 0;
+    unit.question_ids.forEach(function (id) {
+      var s = progress.questionStats[id];
+      if (s) {
+        answered += s.attempts;
+        correct += (s.attempts - s.wrong);
+      }
+    });
+    if (answered === 0) return -1; /* 未着手ユニットを優先するための番兵値 */
+    return correct / answered;
+  }
+
+  function pickTodayLessonUnit(lessons, progress) {
+    if (!lessons || lessons.length === 0) return null;
+    var sorted = lessons.slice().sort(function (a, b) {
+      return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
+    });
+    var learned = {};
+    progress.learnedUnits.forEach(function (id) { learned[id] = true; });
+    var unlearned = sorted.filter(function (u) { return !learned[u.id]; });
+    if (unlearned.length > 0) return unlearned[0];
+
+    var best = null;
+    var bestAcc = Infinity;
+    sorted.forEach(function (u) {
+      var acc = unitAccuracy(progress, u);
+      if (acc < bestAcc) {
+        bestAcc = acc;
+        best = u;
+      }
+    });
+    return best;
+  }
+
+  function markUnitLearned(unitId) {
+    if (state.progress.learnedUnits.indexOf(unitId) === -1) {
+      state.progress.learnedUnits.push(unitId);
+      saveProgress(state.progress);
+    }
+  }
+
+  function applyLessonStep() {
+    var svg = document.querySelector("#lesson-card-diagram svg");
+    var card = state.lessonUnit.cards[state.lessonCardIndex];
+    if (svg) {
+      svg.querySelectorAll("[data-step]").forEach(function (el) {
+        var s = parseInt(el.getAttribute("data-step"), 10);
+        if (s <= state.lessonStep) {
+          el.classList.add("revealed");
+        } else {
+          el.classList.remove("revealed");
+        }
+      });
+    }
+    var stepTextEl = document.getElementById("lesson-card-step-text");
+    if (state.lessonStep > 0) {
+      stepTextEl.textContent = card.steps[state.lessonStep - 1];
+    } else {
+      stepTextEl.textContent = "図解をタップ、または「次の段階」を押すと動きます。";
+    }
+  }
+
+  function updateLessonButtons() {
+    var unit = state.lessonUnit;
+    var card = unit.cards[state.lessonCardIndex];
+    var maxStep = card.steps.length;
+    var isLastCard = state.lessonCardIndex >= unit.cards.length - 1;
+    var reachedEnd = state.lessonStep >= maxStep;
+
+    document.getElementById("lesson-next-step-btn").hidden = reachedEnd;
+    document.getElementById("lesson-replay-btn").hidden = !reachedEnd;
+    document.getElementById("lesson-next-card-btn").hidden = !(reachedEnd && !isLastCard);
+    document.getElementById("lesson-finish-btn").hidden =
+      !(reachedEnd && isLastCard && state.lessonOrigin === "daily");
+    document.getElementById("lesson-skip-btn").hidden = state.lessonOrigin !== "daily";
+
+    var backBtn = document.getElementById("lesson-back-btn");
+    if (state.lessonOrigin === "textbook") {
+      backBtn.hidden = false;
+      backBtn.textContent = "ユニットへ戻る";
+    } else if (state.lessonOrigin === "zukan") {
+      backBtn.hidden = false;
+      backBtn.textContent = "図鑑に戻る";
+    } else {
+      backBtn.hidden = true;
+    }
+  }
+
+  function renderLessonCard() {
+    var unit = state.lessonUnit;
+    var card = unit.cards[state.lessonCardIndex];
+
+    document.getElementById("lesson-unit-title").textContent = unit.title;
+    document.getElementById("lesson-card-progress").textContent =
+      (state.lessonCardIndex + 1) + " / " + unit.cards.length + "カード";
+    document.getElementById("lesson-card-title").textContent = card.title;
+    document.getElementById("lesson-card-diagram").innerHTML = trimDiagram(card.diagram, card.key_concept);
+    document.getElementById("lesson-card-key-concept").textContent = card.key_concept;
+    document.getElementById("lesson-card-body").textContent = card.body;
+    var pnEl = document.getElementById("lesson-card-practice-note");
+    if (card.practice_note) {
+      pnEl.hidden = false;
+      pnEl.textContent = card.practice_note;
+    } else {
+      pnEl.hidden = true;
+    }
+
+    state.lessonStep = prefersReducedMotion() ? card.steps.length : 0;
+    applyLessonStep();
+    updateLessonButtons();
+    show("screen-lesson-card");
+  }
+
+  function startDailyQuizForUnit(unit) {
+    var errorEl = document.getElementById("start-error");
+    errorEl.hidden = true;
+    var pool = buildDailyPool(state.questions, state.progress, unit ? unit.question_ids : null);
+    if (pool.length === 0) {
+      errorEl.hidden = false;
+      errorEl.textContent = "出題できる問題がありません。";
+      show("screen-top");
+      return;
+    }
+    state.isDailySession = true;
+    startQuiz(pool);
+  }
+
+  function renderTextbook() {
+    var container = document.getElementById("textbook-content");
+    container.innerHTML = "";
+    var learned = {};
+    state.progress.learnedUnits.forEach(function (id) { learned[id] = true; });
+
+    var byCategory = {};
+    state.lessons.forEach(function (u) {
+      if (!byCategory[u.category]) byCategory[u.category] = [];
+      byCategory[u.category].push(u);
+    });
+
+    Object.keys(byCategory).forEach(function (cat) {
+      var header = document.createElement("div");
+      header.className = "textbook-category-header";
+      header.textContent = cat;
+      container.appendChild(header);
+
+      byCategory[cat].forEach(function (unit) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "textbook-unit-item" + (learned[unit.id] ? " learned" : "");
+        btn.textContent = (learned[unit.id] ? "✓ " : "") + unit.title + "(" + unit.cards.length + "カード)";
+        btn.addEventListener("click", function () {
+          state.lessonUnit = unit;
+          renderTextbookUnit(unit);
+          show("screen-textbook-unit");
+        });
+        container.appendChild(btn);
+      });
+    });
+  }
+
+  function renderTextbookUnit(unit) {
+    document.getElementById("textbook-unit-category").textContent = unit.category;
+    document.getElementById("textbook-unit-title").textContent = unit.title;
+    document.getElementById("textbook-unit-summary").textContent = unit.summary;
+    var container = document.getElementById("textbook-unit-cards");
+    container.innerHTML = "";
+    unit.cards.forEach(function (card, idx) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "textbook-card-item";
+      btn.textContent = card.title;
+      btn.addEventListener("click", function () {
+        state.lessonUnit = unit;
+        state.lessonCardIndex = idx;
+        state.lessonOrigin = "textbook";
+        renderLessonCard();
+      });
+      container.appendChild(btn);
+    });
   }
 
   function renderTopWrong() {
@@ -821,7 +1134,7 @@
     return remaining;
   }
 
-  function buildDailyPool(questions, progress) {
+  function buildDailyPool(questions, progress, priorityUnitQuestionIds) {
     var usedIds = {};
 
     /* 1. 復習キューから最大5問(古い順=reviewQueue配列の追加順をそのまま使う) */
@@ -867,6 +1180,15 @@
     var newPicks = [];
     var categoryCount = {};
     var remaining = newTarget;
+
+    /* 3a. 今日のレッスンのユニットに属する問題があれば、新規枠へ最優先で入れる
+       (カテゴリ上限・レベル優先より先に適用する。不足分は以降の従来ルールで埋める) */
+    if (priorityUnitQuestionIds && priorityUnitQuestionIds.length > 0) {
+      var unitSet = {};
+      priorityUnitQuestionIds.forEach(function (id) { unitSet[id] = true; });
+      var unitCandidates = unanswered.filter(function (q) { return unitSet[q.id]; });
+      remaining = pickIntoNoCap(newPicks, unitCandidates, remaining, usedIds);
+    }
 
     /* 3b. 優先レベル分を、カテゴリ上限を無視して先に確保する(レベル優先を
        カテゴリ上限より先に適用するため) */
@@ -931,6 +1253,15 @@
       (state.poolIndex + 1) + " / " + state.pool.length + "問";
     document.getElementById("quiz-category").textContent =
       state.current.category + " ・ " + state.current.subtopic;
+
+    var unitTitleEl = document.getElementById("quiz-unit-title");
+    var unitTitle = state.questionUnitTitle[state.current.id];
+    if (unitTitle) {
+      unitTitleEl.hidden = false;
+      unitTitleEl.textContent = "教科書: " + unitTitle;
+    } else {
+      unitTitleEl.hidden = true;
+    }
 
     var quizDiagram = document.getElementById("quiz-diagram");
     if (state.current.question_type === "diagram_read") {
@@ -1133,16 +1464,60 @@
   });
 
   document.getElementById("daily-start-btn").addEventListener("click", function () {
-    var errorEl = document.getElementById("start-error");
-    errorEl.hidden = true;
-    var pool = buildDailyPool(state.questions, state.progress);
-    if (pool.length === 0) {
-      errorEl.hidden = false;
-      errorEl.textContent = "出題できる問題がありません。";
+    var unit = pickTodayLessonUnit(state.lessons, state.progress);
+    if (!unit) {
+      startDailyQuizForUnit(null);
       return;
     }
-    state.isDailySession = true;
-    startQuiz(pool);
+    state.lessonUnit = unit;
+    state.lessonCardIndex = 0;
+    state.lessonOrigin = "daily";
+    renderLessonCard();
+  });
+
+  document.getElementById("lesson-next-step-btn").addEventListener("click", function () {
+    state.lessonStep += 1;
+    applyLessonStep();
+    updateLessonButtons();
+  });
+
+  document.getElementById("lesson-card-diagram").addEventListener("click", function () {
+    var card = state.lessonUnit.cards[state.lessonCardIndex];
+    if (state.lessonStep < card.steps.length) {
+      state.lessonStep += 1;
+      applyLessonStep();
+      updateLessonButtons();
+    }
+  });
+
+  document.getElementById("lesson-replay-btn").addEventListener("click", function () {
+    state.lessonStep = 0;
+    applyLessonStep();
+    updateLessonButtons();
+  });
+
+  document.getElementById("lesson-next-card-btn").addEventListener("click", function () {
+    state.lessonCardIndex += 1;
+    renderLessonCard();
+  });
+
+  document.getElementById("lesson-finish-btn").addEventListener("click", function () {
+    markUnitLearned(state.lessonUnit.id);
+    startDailyQuizForUnit(state.lessonUnit);
+  });
+
+  document.getElementById("lesson-skip-btn").addEventListener("click", function () {
+    startDailyQuizForUnit(state.lessonUnit);
+  });
+
+  document.getElementById("lesson-back-btn").addEventListener("click", function () {
+    if (state.lessonOrigin === "textbook") {
+      renderTextbookUnit(state.lessonUnit);
+      show("screen-textbook-unit");
+    } else if (state.lessonOrigin === "zukan") {
+      renderZukan();
+      show("screen-zukan");
+    }
   });
 
   function bindBackButton(id, action) {
@@ -1167,6 +1542,21 @@
   bindBackButton("zukan-detail-back-btn", function () {
     renderZukan();
     show("screen-zukan");
+  });
+
+  document.getElementById("textbook-link-btn").addEventListener("click", function () {
+    renderTextbook();
+    show("screen-textbook");
+  });
+
+  bindBackButton("textbook-back-btn", function () {
+    refreshTopScreen();
+    show("screen-top");
+  });
+
+  bindBackButton("textbook-unit-back-btn", function () {
+    renderTextbook();
+    show("screen-textbook");
   });
 
   document.getElementById("setup-form").addEventListener("submit", function (e) {
@@ -1215,6 +1605,28 @@
         document.getElementById("loading-message").textContent =
           "問題データの読み込みに失敗しました(" + err.message + ")。ネットワーク接続、またはローカルサーバー経由で開いているかを確認してください。";
       });
+
+    fetch("data/lessons/index.json")
+      .then(function (res) { return res.json(); })
+      .then(function (manifest) {
+        return Promise.all(
+          manifest.map(function (m) {
+            return fetch("data/lessons/" + m.file).then(function (res) { return res.json(); });
+          })
+        );
+      })
+      .then(function (fileResults) {
+        state.lessons = [].concat.apply([], fileResults);
+        var titleMap = {};
+        state.lessons.forEach(function (unit) {
+          unit.question_ids.forEach(function (id) { titleMap[id] = unit.title; });
+        });
+        state.questionUnitTitle = titleMap;
+      })
+      .catch(function (err) {
+        /* レッスンデータが読み込めなくても、従来の「20問」フローで動作を続ける */
+        console.warn("lesson data load failed", err);
+      });
   }
 
   function registerServiceWorker() {
@@ -1234,7 +1646,9 @@
     defaultProgress: defaultProgress,
     getState: function () { return state; },
     todayStr: todayStr,
-    daysBetween: daysBetween
+    daysBetween: daysBetween,
+    pickTodayLessonUnit: pickTodayLessonUnit,
+    unitAccuracy: unitAccuracy
   };
 })();
 </script>

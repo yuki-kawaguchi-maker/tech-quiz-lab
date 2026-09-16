@@ -1,0 +1,349 @@
+[
+  {
+    "id": "github-u01",
+    "category": "GitHub",
+    "level": 1,
+    "title": "リポジトリとコミット",
+    "summary": "リポジトリ・コミット・ステージング・HEADという、Gitの土台になる4つの箱の役割を知る。",
+    "cards": [
+      {
+        "id": "github-u01-c1",
+        "title": "リポジトリ",
+        "key_concept": "リポジトリは、変更履歴を保持する入れ物",
+        "diagram": "<svg viewBox=\"0 0 320 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"ファイル群からリポジトリが作られ、変更履歴を保持する入れ物になることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ファイル群</text></g><line x1=\"120\" y1=\"65\" x2=\"190\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u01c1a)\"/><text x=\"155\" y=\"50\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git init/clone</text><g data-step=\"1\" data-anim=\"a\"><rect x=\"200\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">リポジトリ</text><text x=\"255.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(履歴)</text></g><defs><marker id=\"u01c1a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">リポジトリは、変更履歴を保持する入れ物</text></svg>",
+        "steps": [
+          "git initやgit cloneを行うと、ファイル群が変更履歴ごと保持されるリポジトリになる"
+        ],
+        "body": "リポジトリは、ファイルの中身そのものだけでなく、いつ・どう変わったかという変更履歴もまとめて保持する入れ物である。履歴があるからこそ、過去の状態に戻したり、誰が何を変えたかを追跡できる。ただのフォルダとの違いは、この履歴管理の仕組みを持つかどうかにある。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u01-c2",
+        "title": "コミット",
+        "key_concept": "コミットは、変更を1つの記録に固定する操作",
+        "diagram": "<svg viewBox=\"0 0 320 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git commitにより変更内容が1つの記録としてコミット履歴に固定されることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">変更内容</text></g><line x1=\"120\" y1=\"65\" x2=\"190\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u01c2a)\" data-step=\"1\" data-anim=\"b\" style=\"stroke-dasharray:71;stroke-dashoffset:71\"/><text x=\"155\" y=\"48\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git commit</text><g><rect x=\"200\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミット</text><text x=\"255.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">履歴</text></g><defs><marker id=\"u01c2a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミットは、変更を1つの記録に固定する操作</text></svg>",
+        "steps": [
+          "git commitを実行すると、変更内容が1つの記録(コミット)として履歴に刻まれる"
+        ],
+        "body": "コミットは、その時点の変更内容をスナップショットとして履歴に固定する操作である。固定されるからこそ、後から見返したり、必要なら特定のコミットまで戻ったりできる。1回のコミットにまとめる粒度は自由だが、意味のあるまとまりで区切ると履歴が読みやすくなる。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u01-c3",
+        "title": "ステージングエリア",
+        "key_concept": "ステージングは、次のコミットの下書き置き場",
+        "diagram": "<svg viewBox=\"0 0 340 100\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git addで変更がステージングエリアへ移動することを示す図\"><g><rect x=\"10\" y=\"40\" width=\"90\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"55.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">作業</text><text x=\"55.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ディレクトリ</text></g><g><rect x=\"125\" y=\"40\" width=\"90\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"170.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ステージング</text><text x=\"170.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">エリア</text></g><g><rect x=\"240\" y=\"40\" width=\"90\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"285.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミット</text><text x=\"285.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">履歴</text></g><line x1=\"215\" y1=\"65\" x2=\"235\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u01c3a)\"/><text x=\"225\" y=\"90\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">commit</text><circle cx=\"55\" cy=\"30\" r=\"6\" fill=\"currentColor\" data-step=\"1\" data-anim=\"c\" style=\"--tx:115px;--ty:0px\"/><text x=\"112\" y=\"20\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git add</text><defs><marker id=\"u01c3a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"90\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ステージングは、次のコミットの下書き置き場</text></svg>",
+        "steps": [
+          "git addを実行すると、変更内容がステージングエリアへ移動する"
+        ],
+        "body": "ステージングエリアは、作業ディレクトリとコミット履歴の間にある「次のコミットの下書き置き場」である。git addで変更をここに置いてから、git commitで初めて履歴に記録される。ファイル単位で置けるため、変更した複数ファイルのうち一部だけを次のコミットに含める、という選び方ができる。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u01-c4",
+        "title": "HEAD",
+        "key_concept": "HEADは、今いるブランチの先端を指すポインタ",
+        "diagram": "<svg viewBox=\"0 0 340 100\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git commitによりHEADが新しいコミットへ移動することを示す図\"><g id=\"u01c4a\"><rect x=\"10\" y=\"40\" width=\"120\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミットA</text><text x=\"70.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(旧HEAD)</text></g><g id=\"u01c4b\"><rect x=\"210\" y=\"40\" width=\"120\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"270.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミットB</text><text x=\"270.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(新HEAD)</text></g><line x1=\"130\" y1=\"60\" x2=\"205\" y2=\"60\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u01c4c)\"/><circle cx=\"70\" cy=\"30\" r=\"6\" fill=\"currentColor\" data-step=\"1\" data-anim=\"c\" style=\"--tx:200px;--ty:0px\"/><text x=\"170\" y=\"20\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git commit</text><defs><marker id=\"u01c4c\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"90\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">HEADは、今いるブランチの先端を指すポインタ</text></svg>",
+        "steps": [
+          "git commitを実行すると、HEADは新しく作られたコミットへ移動する"
+        ],
+        "body": "HEADは「今どのコミットで作業しているか」を指し示すポインタである。通常はブランチ名を経由して、そのブランチの先端コミットを指している。git commitで新しいコミットが作られると、ブランチの参照が新しいコミットに向け直されるため、HEAD自体も新しいコミットを指すようになる。",
+        "practice_note": "ループエンジニアリングの運用では、HEADが常に最新コミットを指す性質を使い、git diff --stat HEAD~1でSTATE.md単独追記コミットかどうかを確認する。(出典: loop-engineering-hubのCLAUDE.md「PRレビューの運用ルール」限定例外節)"
+      },
+      {
+        "id": "github-u01-c5",
+        "title": "ステージングの取り消し",
+        "key_concept": "restore --stagedは、addだけを打ち消す操作",
+        "diagram": "<svg viewBox=\"0 0 280 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"restore --stagedがaddの効果だけを打ち消すことを示す図\"><g><rect x=\"10\" y=\"40\" width=\"90\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"55.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">作業</text><text x=\"55.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ディレクトリ</text></g><line x1=\"105\" y1=\"55\" x2=\"165\" y2=\"55\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u01c5a)\"/><text x=\"135\" y=\"43\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git add</text><g><rect x=\"175\" y=\"40\" width=\"90\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"220.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ステージング</text><text x=\"220.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">エリア</text></g><line x1=\"165\" y1=\"80\" x2=\"105\" y2=\"80\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u01c5b)\" data-step=\"1\" data-anim=\"b\" style=\"stroke-dasharray:61;stroke-dashoffset:61\"/><text x=\"135\" y=\"100\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">restore --staged</text><defs><marker id=\"u01c5a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker><marker id=\"u01c5b\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"140\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">restore --stagedは、addだけを打ち消す操作</text></svg>",
+        "steps": [
+          "git restore --stagedを実行すると、ステージングだけが取り消され作業ディレクトリの内容は残る"
+        ],
+        "body": "git addでステージングした内容を取り消したいが、変更内容そのものは消したくない、という場面がある。git restore --stagedは、ステージングエリアへのコピーだけを取り消し、作業ディレクトリ側の実際のファイル内容には触れない。似た効果に見えるgit reset --hardは、作業ディレクトリの変更ごと消してしまうため別物である。",
+        "practice_note": "実例未確認。"
+      }
+    ],
+    "question_ids": [
+      "github-020",
+      "github-021",
+      "github-025",
+      "github-004",
+      "github-038",
+      "github-005",
+      "github-024",
+      "github-006"
+    ]
+  },
+  {
+    "id": "github-u02",
+    "category": "GitHub",
+    "level": 1,
+    "title": "ブランチとマージ",
+    "summary": "ブランチで分岐した作業が、fast-forward・マージコミット・コンフリクトのどれで1本に戻るかを知る。",
+    "cards": [
+      {
+        "id": "github-u02-c1",
+        "title": "ブランチ",
+        "key_concept": "ブランチは、コミットの流れを分岐させる道筋",
+        "diagram": "<svg viewBox=\"0 0 320 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"mainから分岐してfeatureブランチが作られることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">main</text></g><line x1=\"120\" y1=\"65\" x2=\"190\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u02c1a)\"/><text x=\"155\" y=\"48\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git branch feature</text><g data-step=\"1\" data-anim=\"a\"><rect x=\"200\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">feature</text></g><defs><marker id=\"u02c1a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ブランチは、コミットの流れを分岐させる道筋</text></svg>",
+        "steps": [
+          "git branch featureを実行すると、mainから分岐した新しい道筋(feature)ができる"
+        ],
+        "body": "ブランチは、コミットの流れを分岐させて、複数の作業を並行して進めるための道筋である。mainを直接触らずにfeatureで作業できるため、試した内容が失敗してもmain側には影響しない。分岐した後は、必要に応じてmergeやrebaseで再び1本にまとめる。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u02-c2",
+        "title": "fast-forwardマージ",
+        "key_concept": "fast-forwardは、ポインタを進めるだけの統合",
+        "diagram": "<svg viewBox=\"0 0 320 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"fast-forwardマージでmainのポインタがfeatureの先端に進むことを示す図\"><g id=\"u02c2a\"><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">main</text><text x=\"65.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(旧位置)</text></g><g id=\"u02c2b\"><rect x=\"200\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">feature</text><text x=\"255.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(先端)</text></g><line x1=\"120\" y1=\"65\" x2=\"195\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u02c2c)\"/><circle cx=\"70\" cy=\"30\" r=\"6\" fill=\"currentColor\" data-step=\"1\" data-anim=\"c\" style=\"--tx:190px;--ty:0px\"/><text x=\"165\" y=\"20\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">fast-forward</text><defs><marker id=\"u02c2c\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">fast-forwardは、ポインタを進めるだけの統合</text></svg>",
+        "steps": [
+          "mainが分岐後に進んでいない場合、mainのポインタはfeatureの先端まで進むだけで統合が終わる"
+        ],
+        "body": "fast-forwardマージは、分岐元のmainが分岐後に一切進んでいない場合に起きる特別な統合である。featureの履歴はmainの続きとして直線上に並んでいるため、Gitは新しいコミットを作る必要がなく、mainという参照をfeatureの先端に付け替えるだけで済む。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u02-c3",
+        "title": "マージコミット",
+        "key_concept": "マージコミットは、親を2つ持つ統合コミット",
+        "diagram": "<svg viewBox=\"0 0 320 160\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"mainとfeatureの両方を親に持つマージコミットが作られることを示す図\"><g id=\"u02c3a\"><rect x=\"10\" y=\"15\" width=\"110\" height=\"45\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"34.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">main</text><text x=\"65.0\" y=\"49.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(分岐後)</text></g><g id=\"u02c3b\"><rect x=\"200\" y=\"15\" width=\"110\" height=\"45\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"34.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">feature</text><text x=\"255.0\" y=\"49.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(分岐後)</text></g><g id=\"u02c3c\"><rect x=\"105\" y=\"90\" width=\"110\" height=\"45\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"160.0\" y=\"109.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">マージ</text><text x=\"160.0\" y=\"124.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミット</text></g><line x1=\"65\" y1=\"60\" x2=\"150\" y2=\"90\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u02c3a1)\" data-step=\"1\" data-anim=\"b\" style=\"stroke-dasharray:91;stroke-dashoffset:91\"/><line x1=\"255\" y1=\"60\" x2=\"175\" y2=\"90\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u02c3a2)\" data-step=\"1\" data-anim=\"b\" style=\"stroke-dasharray:86;stroke-dashoffset:86\"/><defs><marker id=\"u02c3a1\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker><marker id=\"u02c3a2\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"150\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">マージコミットは、親を2つ持つ統合コミット</text></svg>",
+        "steps": [
+          "main・feature双方が分岐後に進んでいると、両方を親に持つマージコミットが新しく作られる"
+        ],
+        "body": "mainとfeatureの両方が分岐後にそれぞれ別のコミットを積んでいる場合、単純にポインタを進めるだけでは片方の変更しか反映できない。そこでGitは、両方の履歴を親として持つマージコミットを新しく作ることで、両方の変更をまとめて統合する。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u02-c4",
+        "title": "コンフリクト",
+        "key_concept": "コンフリクトは、同じ箇所への変更の競合",
+        "diagram": "<svg viewBox=\"0 0 320 160\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"mainとfeatureが同じ行を変更しコンフリクトになることを示す図\"><g><rect x=\"10\" y=\"15\" width=\"110\" height=\"45\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"34.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">feature側</text><text x=\"65.0\" y=\"49.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">の変更</text></g><g><rect x=\"200\" y=\"15\" width=\"110\" height=\"45\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"34.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">main側</text><text x=\"255.0\" y=\"49.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">の変更</text></g><g data-step=\"1\" data-anim=\"a\"><rect x=\"105\" y=\"90\" width=\"110\" height=\"45\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"160.0\" y=\"109.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">同じ行</text><text x=\"160.0\" y=\"124.5\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(競合)</text></g><line x1=\"65\" y1=\"60\" x2=\"150\" y2=\"90\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u02c4a)\"/><line x1=\"255\" y1=\"60\" x2=\"175\" y2=\"90\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u02c4b)\"/><defs><marker id=\"u02c4a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker><marker id=\"u02c4b\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"150\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コンフリクトは、同じ箇所への変更の競合</text></svg>",
+        "steps": [
+          "mainとfeatureが同じ行を別々に変更していると、その箇所がコンフリクトとして検出される"
+        ],
+        "body": "コンフリクトは、両方のブランチが同じ箇所に対して異なる変更を加えた場合に起きる。Gitは変更箇所が重なっていなければ自動的に両方を取り込めるが、重なった箇所はどちらが正しいか判断できないため、作業者に手動での解決を求める。",
+        "practice_note": "STATE.mdのような全体共有ファイルは、複数PRが並行して更新すると同じ箇所への追記が重なりコンフリクトしやすい。(出典: loop-engineering-hubのskill-src/salesforce-trial-builder/references/implementation-kickoff.md「2. PRの並行作業は避ける」節)"
+      }
+    ],
+    "question_ids": [
+      "github-022",
+      "github-033",
+      "github-007",
+      "github-008",
+      "github-034",
+      "github-009",
+      "github-010",
+      "github-028"
+    ]
+  },
+  {
+    "id": "github-u03",
+    "category": "GitHub",
+    "level": 1,
+    "title": "リモートとfetch・pull・push",
+    "summary": "ローカルとリモートの間を行き来するfetch・push・pullの向きの違いと、origin・403の意味を知る。",
+    "cards": [
+      {
+        "id": "github-u03-c1",
+        "title": "リモートリポジトリ(origin)",
+        "key_concept": "originは、リモートリポジトリの慣習的な別名",
+        "diagram": "<svg viewBox=\"0 0 340 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"リモートリポジトリにoriginという別名が付けられることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"130\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"75.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">リモート</text><text x=\"75.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">リポジトリ</text></g><g data-step=\"1\" data-anim=\"a\"><rect x=\"230\" y=\"40\" width=\"90\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"275.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">origin</text></g><line x1=\"140\" y1=\"65\" x2=\"225\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u03c1a)\"/><text x=\"182\" y=\"55\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">別名</text><defs><marker id=\"u03c1a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">originは、リモートリポジトリの慣習的な別名</text></svg>",
+        "steps": [
+          "cloneすると、そのリモートリポジトリに自動でoriginという名前が付く"
+        ],
+        "body": "originは、リモートリポジトリそのものの固有名ではなく、慣習として付けられる別名(エイリアス)である。git cloneした際に自動的にoriginという名前が割り当てられるが、git remote renameで別の名前に変えることもできる。名前は変わっても、指している先のリモートリポジトリという実体は変わらない。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u03-c2",
+        "title": "fetch",
+        "key_concept": "fetchは、追跡ブランチだけ更新し作業ブランチは不変",
+        "diagram": "<svg viewBox=\"0 0 340 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git fetchがリモート追跡ブランチのみを更新することを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">リモート</text></g><line x1=\"120\" y1=\"65\" x2=\"190\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u03c2a)\" data-step=\"1\" data-anim=\"b\" style=\"stroke-dasharray:71;stroke-dashoffset:71\"/><text x=\"155\" y=\"48\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git fetch</text><g><rect x=\"200\" y=\"40\" width=\"130\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"265.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">追跡ブランチ</text><text x=\"265.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(origin/main)</text></g><defs><marker id=\"u03c2a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">fetchは、追跡ブランチだけ更新し作業ブランチは不変</text></svg>",
+        "steps": [
+          "git fetchを実行すると、追跡ブランチ(origin/main等)だけが最新化される"
+        ],
+        "body": "git fetchは、リモートの最新状態を追跡ブランチにコピーするだけで、作業ブランチには一切手を加えない操作である。取得した内容を確認してから、必要ならmergeやrebaseで作業ブランチに取り込むかを自分で判断できる。取得と取り込みを分けられる点がpullとの違いである。",
+        "practice_note": "ループエンジニアリングの運用ルールでは、セッション開始直後に必ずgit fetchを実行し、origin/<デフォルトブランチ>との差分を1行報告してから着手する。(出典: skill-src/loop-operating-rules/SKILL.md「冒頭のgit fetchと差分報告」節)"
+      },
+      {
+        "id": "github-u03-c3",
+        "title": "push",
+        "key_concept": "pushは、ローカルの変更をリモートへ送る操作",
+        "diagram": "<svg viewBox=\"0 0 320 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git pushでローカルの変更がリモートへ送られることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ローカル</text></g><line x1=\"120\" y1=\"65\" x2=\"190\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u03c3a)\" data-step=\"1\" data-anim=\"b\" style=\"stroke-dasharray:71;stroke-dashoffset:71\"/><text x=\"155\" y=\"48\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git push</text><g><rect x=\"200\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">リモート</text></g><defs><marker id=\"u03c3a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">pushは、ローカルの変更をリモートへ送る操作</text></svg>",
+        "steps": [
+          "git pushを実行すると、ローカルのコミットがリモートリポジトリへ反映される"
+        ],
+        "body": "git pushは、ローカルで作られたコミットをリモートリポジトリに送信し、リモート側の履歴を進める操作である。fetch・pullがリモートからローカルへの方向であるのに対し、pushは逆方向(ローカルからリモートへ)である点が要点になる。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u03-c4",
+        "title": "pull",
+        "key_concept": "pullは、取得と同時に作業ブランチへ反映する操作",
+        "diagram": "<svg viewBox=\"0 0 340 100\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git pullがリモートの内容を取得し作業ブランチへ即座に反映することを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">リモート</text></g><g><rect x=\"220\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"275.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">作業ブランチ</text></g><line x1=\"120\" y1=\"65\" x2=\"215\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u03c4a)\"/><circle cx=\"70\" cy=\"30\" r=\"6\" fill=\"currentColor\" data-step=\"1\" data-anim=\"c\" style=\"--tx:190px;--ty:0px\"/><text x=\"165\" y=\"20\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git pull(fetch+merge)</text><defs><marker id=\"u03c4a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"90\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">pullは、取得と同時に作業ブランチへ反映する操作</text></svg>",
+        "steps": [
+          "git pullを実行すると、リモートの内容が取得され、そのまま作業ブランチへ反映される"
+        ],
+        "body": "git pullは、内部的にはgit fetchとgit mergeを1コマンドでまとめて実行する操作である。取得と同時に作業ブランチへ反映されるため手軽だが、取得した内容を確認する間がない。内容を見てから取り込むかどうか判断したい場合は、fetchとmergeを別々に実行する方が安全である。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u03-c5",
+        "title": "認証と403",
+        "key_concept": "403は、認証済みだが操作が許可されない印",
+        "diagram": "<svg viewBox=\"0 0 340 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"認証は通っているが操作の権限が無く403になることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"130\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"75.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">認証OK</text></g><g data-step=\"1\" data-anim=\"a\"><rect x=\"230\" y=\"40\" width=\"100\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"280.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">権限NG</text><text x=\"280.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(403)</text></g><line x1=\"140\" y1=\"65\" x2=\"225\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u03c5a)\"/><defs><marker id=\"u03c5a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">403は、認証済みだが操作が許可されない印</text></svg>",
+        "steps": [
+          "認証には成功していても、その操作を行う権限が無い場合は403が返る"
+        ],
+        "body": "HTTPステータス403(Forbidden)は、本人確認(認証)自体は済んでいるが、要求した操作を行う権限が無いことを示す印である。認証情報が誤っている場合(401)とは別の問題であり、403の場合は権限設定(コラボレーター権限やブランチ保護等)を見直す必要がある。",
+        "practice_note": "ループエンジニアリングの運用では、マージ済みブランチの削除を試みるとHTTP 403で失敗することが繰り返し確認されており、既知の権限制約として報告する運用にしている。(出典: 本プロジェクトSTATE.mdの各PRマージ報告)"
+      }
+    ],
+    "question_ids": [
+      "github-023",
+      "github-001",
+      "github-030",
+      "github-031",
+      "github-032",
+      "github-014",
+      "github-015",
+      "github-016"
+    ]
+  },
+  {
+    "id": "github-u04",
+    "category": "GitHub",
+    "level": 1,
+    "title": "fork・clone・プルリクエスト",
+    "summary": "他人のリポジトリに貢献する経路(fork・clone)と、レビューを挟んでmainに統合する仕組みを知る。",
+    "cards": [
+      {
+        "id": "github-u04-c1",
+        "title": "clone",
+        "key_concept": "cloneは、リモートを丸ごと複製し新規作成する操作",
+        "diagram": "<svg viewBox=\"0 0 320 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git cloneでリモートリポジトリが丸ごとローカルに複製されることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">リモート</text></g><line x1=\"120\" y1=\"65\" x2=\"190\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u04c1a)\" data-step=\"1\" data-anim=\"b\" style=\"stroke-dasharray:71;stroke-dashoffset:71\"/><text x=\"155\" y=\"48\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git clone</text><g><rect x=\"200\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ローカル</text><text x=\"255.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(新規)</text></g><defs><marker id=\"u04c1a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">cloneは、リモートを丸ごと複製し新規作成する操作</text></svg>",
+        "steps": [
+          "git cloneを実行すると、リモートリポジトリの内容が丸ごとローカルに新規作成される"
+        ],
+        "body": "git cloneは、リモートリポジトリの履歴ごとすべてをローカルに複製し、新しいローカルリポジトリを作る操作である。既存のローカルリポジトリを更新するfetch・pullとは異なり、まだ手元に何も無い状態から始める点が特徴になる。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u04-c2",
+        "title": "fork",
+        "key_concept": "forkは、GitHub上での自分名義への複製",
+        "diagram": "<svg viewBox=\"0 0 340 100\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"forkで本家リポジトリが自分名義のリポジトリとして複製されることを示す図\"><g id=\"u04c2a\"><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">本家</text><text x=\"65.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">リポジトリ</text></g><g id=\"u04c2b\"><rect x=\"220\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"275.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">自分名義</text><text x=\"275.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(GitHub)</text></g><line x1=\"120\" y1=\"65\" x2=\"215\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u04c2c)\"/><circle cx=\"70\" cy=\"30\" r=\"6\" fill=\"currentColor\" data-step=\"1\" data-anim=\"c\" style=\"--tx:210px;--ty:0px\"/><text x=\"175\" y=\"20\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">fork</text><defs><marker id=\"u04c2c\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"90\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">forkは、GitHub上での自分名義への複製</text></svg>",
+        "steps": [
+          "forkを行うと、GitHub上に自分の権限で書き込める複製ができる"
+        ],
+        "body": "forkは、GitHub上で本家リポジトリのスナップショットを、自分のアカウント名義の独立したリポジトリとして複製する操作である。複製後は自分がowner権限を持つため、本家への書き込み権限が無くても自由にpushできる。この自分名義のリポジトリをさらにローカルへcloneして作業する。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u04-c3",
+        "title": "プルリクエスト",
+        "key_concept": "プルリクエストは、レビュー付きの変更取り込み提案",
+        "diagram": "<svg viewBox=\"0 0 320 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"プルリクエストを経てfeatureの変更がmainに取り込まれることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">feature</text><text x=\"65.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ブランチ</text></g><g data-step=\"1\" data-anim=\"a\"><rect x=\"200\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">main</text></g><line x1=\"120\" y1=\"65\" x2=\"195\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u04c3a)\"/><text x=\"157\" y=\"53\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">レビュー後</text><defs><marker id=\"u04c3a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">プルリクエストは、レビュー付きの変更取り込み提案</text></svg>",
+        "steps": [
+          "レビューを経て承認されると、プルリクエストの変更がmainに取り込まれる"
+        ],
+        "body": "プルリクエストは、featureブランチの変更をmainに直接pushするのではなく、いったん提案として提出し、レビューを経てから取り込む仕組みである。レビューを挟むことで、コードの問題や設計上の懸念を取り込み前に見つけられる。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u04-c4",
+        "title": "squashマージ",
+        "key_concept": "squashは、複数コミットを1つにまとめて統合",
+        "diagram": "<svg viewBox=\"0 0 340 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"squashマージで複数コミットが1つにまとめられることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"130\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"75.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">複数コミット</text></g><g data-step=\"1\" data-anim=\"a\"><rect x=\"220\" y=\"40\" width=\"100\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"270.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">1コミット</text></g><line x1=\"140\" y1=\"65\" x2=\"215\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u04c4a)\"/><text x=\"178\" y=\"53\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">squash</text><defs><marker id=\"u04c4a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">squashは、複数コミットを1つにまとめて統合</text></svg>",
+        "steps": [
+          "squashマージを選ぶと、PR内の複数コミットが1つのコミットにまとめられてmainに統合される"
+        ],
+        "body": "squashマージは、PR内で積み重ねた複数のコミット(試行錯誤や修正のやり取りを含む)を、mainに統合する際に1つのコミットにまとめる方式である。mainの履歴が読みやすくなる一方、PR内の細かい経緯は個々のコミットとしては残らない。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u04-c5",
+        "title": "head SHAとレビュー対象",
+        "key_concept": "head SHAは、レビュー対象コミットを固定する印",
+        "diagram": "<svg viewBox=\"0 0 380 110\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"レビューコメントのhead SHAとPRの現在headが一致するかを確認することを示す図\"><g id=\"u04c5a\"><rect x=\"10\" y=\"40\" width=\"140\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"80.0\" y=\"69.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">PRの現在head</text></g><g id=\"u04c5b\"><rect x=\"220\" y=\"40\" width=\"140\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"290.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">レビューコメントの</text><text x=\"290.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">head</text></g><line x1=\"150\" y1=\"65\" x2=\"215\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u04c5c)\"/><circle cx=\"200\" cy=\"20\" r=\"6\" fill=\"currentColor\" data-step=\"1\" data-anim=\"c\" style=\"--tx:40px;--ty:0px\"/><text x=\"220\" y=\"10\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">一致を確認</text><defs><marker id=\"u04c5c\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"190\" y=\"100\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">head SHAは、レビュー対象コミットを固定する印</text></svg>",
+        "steps": [
+          "マージ前に、レビューコメントが記録したhead SHAとPRの現在headが一致するか確認する"
+        ],
+        "body": "head SHAは、レビューがどのコミット時点を対象にしたかを固定して示す印である。レビュー後に新しいコミットが追加pushされると、PRの現在headはそのSHAから進んでしまう。そのため、マージ前にレビューコメントのhead SHAとPRの現在headが一致しているかを確認する必要がある。",
+        "practice_note": "手動再レビューの完了報告(PRコメント)の見出しは「## 手動再レビュー結果(head <SHA>、PR全体差分)」に統一し、マージ判断はこのSHAとPRの現在headが一致することを確認してから行う。(出典: loop-engineering-hubのskill-src/loop-operating-rules/SKILL.md「PRマージ」節)"
+      }
+    ],
+    "question_ids": [
+      "github-026",
+      "github-029",
+      "github-003",
+      "github-036",
+      "github-037",
+      "github-027",
+      "github-017",
+      "github-018",
+      "github-019",
+      "github-039"
+    ]
+  },
+  {
+    "id": "github-u05",
+    "category": "GitHub",
+    "level": 1,
+    "title": "ステージング・HEAD・取り消し(reset/revert/stash)",
+    "summary": "reset --soft・revert・stash・rebaseという、履歴やステージングを操作する4つの取り消し系操作を知る。",
+    "cards": [
+      {
+        "id": "github-u05-c1",
+        "title": "reset --soft",
+        "key_concept": "reset --softは、履歴だけ戻し変更内容は残す",
+        "diagram": "<svg viewBox=\"0 0 340 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"reset --softで履歴だけコミットAに戻り変更内容はステージングに残ることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"130\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"75.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミットB</text><text x=\"75.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(戻す)</text></g><g data-step=\"1\" data-anim=\"a\"><rect x=\"230\" y=\"40\" width=\"100\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"280.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミットA</text><text x=\"280.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">+差分</text></g><line x1=\"140\" y1=\"65\" x2=\"225\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u05c1a)\"/><text x=\"182\" y=\"53\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">reset --soft</text><defs><marker id=\"u05c1a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">reset --softは、履歴だけ戻し変更内容は残す</text></svg>",
+        "steps": [
+          "git reset --softを実行すると、履歴だけコミットAに戻り、変更内容はステージングに残る"
+        ],
+        "body": "git reset --softは、指定したコミットまで履歴を戻しつつ、その間の変更内容はステージングエリアに残す操作である。複数コミットを1つにまとめ直したいときに、いったん履歴だけ巻き戻し、残った変更をまとめてコミットし直す、という使い方ができる。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u05-c2",
+        "title": "revert",
+        "key_concept": "revertは、履歴を残したまま変更を打ち消す",
+        "diagram": "<svg viewBox=\"0 0 320 120\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git revertが元のコミットを残したまま打ち消しコミットを追加することを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">元の</text><text x=\"65.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミット</text></g><line x1=\"120\" y1=\"65\" x2=\"190\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u05c2a)\" data-step=\"1\" data-anim=\"b\" style=\"stroke-dasharray:71;stroke-dashoffset:71\"/><text x=\"155\" y=\"48\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git revert</text><g><rect x=\"200\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">打ち消し</text><text x=\"255.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コミット</text></g><defs><marker id=\"u05c2a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"110\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">revertは、履歴を残したまま変更を打ち消す</text></svg>",
+        "steps": [
+          "git revertを実行すると、元のコミットは残したまま、その変更を打ち消す新しいコミットが追加される"
+        ],
+        "body": "revertは、過去のコミットをそのまま残し、その内容を打ち消す差分を持つ新しいコミットを履歴の末尾に追加する操作である。すでに他の人が同じ履歴を取得している共有ブランチでは、履歴を書き換えるreset --hardより、履歴を追加するだけのrevertの方が安全である。",
+        "practice_note": "実例未確認。"
+      },
+      {
+        "id": "github-u05-c3",
+        "title": "stash",
+        "key_concept": "stashは、未コミットの変更を一時退避する棚",
+        "diagram": "<svg viewBox=\"0 0 320 100\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git stashが未コミットの変更を一時退避することを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">作業</text><text x=\"65.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ディレクトリ</text></g><g><rect x=\"200\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"255.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">stash</text><text x=\"255.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(退避先)</text></g><line x1=\"120\" y1=\"65\" x2=\"195\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u05c3a)\"/><circle cx=\"65\" cy=\"30\" r=\"6\" fill=\"currentColor\" data-step=\"1\" data-anim=\"c\" style=\"--tx:190px;--ty:0px\"/><text x=\"160\" y=\"20\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git stash</text><defs><marker id=\"u05c3a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"160\" y=\"90\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">stashは、未コミットの変更を一時退避する棚</text></svg>",
+        "steps": [
+          "git stashを実行すると、未コミットの変更が一時的な棚(stash)へ退避される"
+        ],
+        "body": "stashは、コミットするほどではないが今すぐは扱いたくない変更を、一時的な保管場所に退避させる仕組みである。stash実行後、作業ディレクトリは直前のコミット時点の状態に戻り、後でgit stash popを実行すると退避した変更を呼び戻せる。",
+        "practice_note": "sfdxプロジェクトでgit stash -uを使うと、gitが追跡しない空ディレクトリがstash実行時に削除され、ブランチ操作を挟むと作業ツリーから消えてデプロイが全滅した実例がある。(出典: loop-engineering-hubのskill-src/salesforce-trial-builder/references/setup_gotchas.md 13節「gitは空ディレクトリを追跡しない」)"
+      },
+      {
+        "id": "github-u05-c4",
+        "title": "rebase",
+        "key_concept": "rebaseは、コミットを新しい土台の上に積み直す操作",
+        "diagram": "<svg viewBox=\"0 0 340 100\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git rebase mainでfeatureのコミットがmainの先端に付け替わることを示す図\"><g><rect x=\"10\" y=\"40\" width=\"110\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"65.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">main</text><text x=\"65.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(最新)</text></g><g><rect x=\"200\" y=\"40\" width=\"130\" height=\"50\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"265.0\" y=\"62.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">feature</text><text x=\"265.0\" y=\"77.0\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">(付け替え後)</text></g><line x1=\"120\" y1=\"65\" x2=\"195\" y2=\"65\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#u05c4a)\"/><circle cx=\"65\" cy=\"30\" r=\"6\" fill=\"currentColor\" data-step=\"1\" data-anim=\"c\" style=\"--tx:200px;--ty:0px\"/><text x=\"165\" y=\"20\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">git rebase main</text><defs><marker id=\"u05c4a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"170\" y=\"90\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">rebaseは、コミットを新しい土台の上に積み直す操作</text></svg>",
+        "steps": [
+          "git rebase mainを実行すると、featureのコミットがmainの最新の上に積み直される"
+        ],
+        "body": "rebaseは、featureブランチのコミット群をいったん取り外し、指定したブランチ(main)の最新コミットの直後に1つずつ再適用していく操作である。見た目上は同じ変更内容でも、mainの上に積み直された新しいコミットとして生成されるため、分岐点が消え履歴が1本の直線になる。",
+        "practice_note": "実例未確認。"
+      }
+    ],
+    "question_ids": [
+      "github-002",
+      "github-011",
+      "github-012",
+      "github-013",
+      "github-035"
+    ]
+  }
+]
