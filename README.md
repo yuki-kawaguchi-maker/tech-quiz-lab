@@ -38,8 +38,9 @@
    「惜しい・混同しやすい概念」にする。
 4. **SVG図解を作る**: 各問1枚、「箱2〜3個+矢印+ラベル+ひと言キャプション」の型を守り、
    要素を増やさない。既存問題(`data/questions/github.json`)のSVGを参考にする。
-5. **バリデーションする**: 追加後、`data/questions/<category>.json` が
-   `docs/question-schema.md` の各条件(choices件数・answer_indexの整合・
-   why_right/why_wrongの排他等)を満たすか確認する。
+5. **バリデーションする**: 追加後、`python3 scripts/validate_questions.py` を実行し、
+   `docs/question-schema.md` の各条件(必須フィールド・choices件数・answer_indexの整合・
+   why_right/why_wrongの排他・key_conceptの文字数とキャプション一致・diagramの箱/矢印数等)を
+   満たすか機械的に確認する。EXIT 0になることを確認してからコミットする。
 6. **コミット・PR**: 変更ファイル一覧とサンプル問題のidだけをPR本文に記載し、
    解説・SVG本文はチャットやPR本文に貼らない。

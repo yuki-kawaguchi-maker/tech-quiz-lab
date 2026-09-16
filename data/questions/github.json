@@ -88,5 +88,485 @@
     "diagram": "<svg viewBox=\"0 0 380 150\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"forkでGitHub上に自分名義のコピーを作り、そこからローカルにcloneすることを示す図(本家リポジトリ・自分名義のリポジトリ・ローカルの3箱)\"><rect x=\"5\" y=\"50\" width=\"90\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"50\" y=\"70\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">本家</text><text x=\"50\" y=\"85\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">リポジトリ</text><line x1=\"95\" y1=\"70\" x2=\"140\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow3)\"/><text x=\"117\" y=\"58\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">fork</text><rect x=\"145\" y=\"50\" width=\"90\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"190\" y=\"70\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">自分名義</text><text x=\"190\" y=\"85\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(GitHub)</text><line x1=\"235\" y1=\"70\" x2=\"280\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow3)\"/><text x=\"257\" y=\"58\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">clone</text><rect x=\"285\" y=\"50\" width=\"90\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"330\" y=\"75\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ローカル</text><defs><marker id=\"arrow3\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"190\" y=\"130\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">forkは、書き込み権限を得るための自分名義の複製</text></svg>",
     "practice_note": "実例未確認(loop-engineering-hub内にfork/clone運用に関する具体的な記録は見つからなかった)。",
     "difficulty": 1
+  },
+  {
+    "id": "github-004",
+    "category": "GitHub",
+    "subtopic": "コミットとステージング(add/commit/HEAD)",
+    "key_concept": "ステージングは、次のコミットの下書き置き場",
+    "question": "git add でファイルをステージングした後、まだ git commit を実行していない。この時点でファイルの変更はどこに記録されているか、最も正確なものはどれか。",
+    "choices": [
+      {
+        "text": "リモートリポジトリに送信され、origin/mainに反映されている",
+        "why_wrong": "リモートへの送信はgit pushの役割であり、addやcommitだけではローカルリポジトリ内で完結し、リモートには一切送信されない。"
+      },
+      {
+        "text": "ステージングエリア(インデックス)に記録され、次のcommitに含める準備ができた状態",
+        "why_right": "git addは変更内容をステージングエリア(インデックス)に記録するだけの操作で、コミット履歴にはまだ残らない。次にgit commitを実行して初めて、その内容が新しいコミットとして記録される。"
+      },
+      {
+        "text": "作業ディレクトリのファイルがそのまま最新コミットとして扱われる",
+        "why_wrong": "addした時点ではまだコミットは作られていない。addはあくまでステージングであり、コミット履歴に新しいスナップショットを作る操作ではない。"
+      },
+      {
+        "text": "HEADが指すコミットの内容が直接書き換えられる",
+        "why_wrong": "HEADは既存のコミットを指すポインタであり、addによって既存コミットの中身が書き換わることはない。新しい内容は次のcommitで新しいコミットとして追加される。"
+      }
+    ],
+    "answer_index": 1,
+    "explanation": "ステージングエリア(インデックス)は、作業ディレクトリ(実際のファイル)とコミット履歴(git commitで確定した記録)の間にある「次のコミットの下書き」の置き場である。git addは変更をこの下書きに載せる操作で、まだ履歴には残らない。ファイル単位でステージングできるため、変更した複数ファイルのうち一部だけを次のコミットに含める、という選び方ができる。git commitを実行した瞬間に、ステージングエリアの内容がスナップショットとして確定し、新しいコミットになる。",
+    "diagram": "<svg viewBox=\"0 0 380 150\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"作業ディレクトリからステージングエリアを経てコミット履歴に至る流れを示す図\"><rect x=\"5\" y=\"50\" width=\"90\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"50\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">作業</text><text x=\"50\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">ディレクトリ</text><rect x=\"140\" y=\"50\" width=\"90\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"185\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">ステージング</text><text x=\"185\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">エリア</text><rect x=\"275\" y=\"50\" width=\"90\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"320\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">コミット</text><text x=\"320\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">履歴</text><line x1=\"95\" y1=\"70\" x2=\"140\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow4)\"/><text x=\"118\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">git add</text><line x1=\"230\" y1=\"70\" x2=\"275\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow4)\"/><text x=\"252\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">git commit</text><defs><marker id=\"arrow4\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"185\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">ステージングは、次のコミットの下書き置き場</text></svg>",
+    "practice_note": "実例未確認(loop-engineering-hub内にgit add/ステージング運用に関する具体的な記録は見つからなかった)。",
+    "difficulty": 1
+  },
+  {
+    "id": "github-005",
+    "category": "GitHub",
+    "subtopic": "コミットとステージング(add/commit/HEAD)",
+    "key_concept": "HEADは、今いるブランチの先端を指すポインタ",
+    "question": "git commit を実行すると、HEAD はどう変化するか。最も正確な説明はどれか。",
+    "choices": [
+      {
+        "text": "HEADが指すブランチの先端が、新しく作られたコミットに移動する",
+        "why_right": "commitは新しいコミットオブジェクトを作り、現在のブランチ(HEADが指すブランチ)の参照先をその新しいコミットに進める。結果としてHEAD自体も新しいコミットを指すことになる。"
+      },
+      {
+        "text": "HEADが直前のコミットに戻る",
+        "why_wrong": "commitは履歴を進める操作であり、戻す操作ではない。「戻す」動きはgit resetやgit checkoutが担う操作であり、commitの効果とは逆方向。"
+      },
+      {
+        "text": "HEADがリモートの最新コミットに同期される",
+        "why_wrong": "リモートとの同期はfetchやpullの役割であり、ローカルでcommitしただけではリモートの情報は一切参照されない。"
+      },
+      {
+        "text": "HEADがステージングエリアの内容を指すようになる",
+        "why_wrong": "HEADが指すのは常にコミット(スナップショット)であり、ステージングエリアという「commit前の下書き」を直接指すことはない。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "HEADは「今どのコミットで作業しているか」を指し示すポインタで、通常は現在のブランチ名(例: main)を経由して、そのブランチの先端コミットを指している。git commitはステージングエリアの内容から新しいコミットを作り、そのブランチの参照を新しいコミットに向け直す。結果としてHEAD(ブランチ経由)も新しいコミットを指すようになり、これが「コミットするとHEADが進む」という動きの実体である。ブランチを切り替えるとHEADが指すブランチ自体が変わる点も、この仕組みの応用である。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"git commitによりHEADが新しいコミットへ移動することを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">コミットA</text><text x=\"70.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">(旧HEAD)</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow5)\"/><text x=\"165\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">git commit</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">コミットB</text><text x=\"260.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">(新HEAD)</text><defs><marker id=\"arrow5\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">HEADは、今いるブランチの先端を指すポインタ</text></svg>",
+    "practice_note": "ループエンジニアリングの運用では、STATE.md単独追記コミットかどうかを`git diff --stat HEAD~1`で確認する(HEAD~1は「現在のHEADの1つ前のコミット」を指す)。HEADが常に最新コミットを指すポインタであることを利用した確認方法である。(出典: loop-engineering-hubのCLAUDE.md「PRレビューの運用ルール」限定例外節)",
+    "difficulty": 1
+  },
+  {
+    "id": "github-006",
+    "category": "GitHub",
+    "subtopic": "コミットとステージング(add/commit/HEAD)",
+    "key_concept": "restore --stagedは、addだけを打ち消す操作",
+    "question": "git addで誤って関係ないファイルまでステージングしてしまった。まだcommitはしていない。このファイルだけステージングを取り消したい(作業ディレクトリの変更内容は残したい)場合、適切な操作はどれか。",
+    "choices": [
+      {
+        "text": "git restore --staged <ファイル>",
+        "why_right": "ステージングエリアから当該ファイルだけを外し、作業ディレクトリの変更内容はそのまま残す。addの効果だけを取り消す操作。"
+      },
+      {
+        "text": "git reset --hard",
+        "why_wrong": "ステージングだけでなく作業ディレクトリの変更内容ごと削除してしまう。「変更内容は残したい」という要件に反する強すぎる操作。"
+      },
+      {
+        "text": "git commit --amend",
+        "why_wrong": "直前のコミットを書き換える操作であり、まだ行っていないコミットには使えない。ステージングの取り消しとは別の操作。"
+      },
+      {
+        "text": "git rm --cached <ファイル>",
+        "why_wrong": "追跡対象からファイルを外す(以後のコミットで無視する)操作に近く、次回以降のステージングにも影響する。今回だけステージングを取り消したいという一時的な要件には強すぎる。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "ステージングエリアと作業ディレクトリは別々の場所であり、git addは作業ディレクトリの内容をステージングエリアにコピーするだけの操作である。git restore --stagedは、このコピーだけを取り消し、作業ディレクトリ側の実際のファイル内容には触れない。これに対しgit reset --hardは、ステージングエリアと作業ディレクトリの両方を、指定したコミットの状態に強制的に戻してしまうため、意図した変更内容そのものが消えてしまう。",
+    "diagram": "<svg viewBox=\"0 0 340 150\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"restore --stagedがaddの効果だけを打ち消すことを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"68\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">作業</text><text x=\"70.0\" y=\"80\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">ディレクトリ</text><line x1=\"130\" y1=\"64\" x2=\"200\" y2=\"64\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow6a)\"/><text x=\"165\" y=\"46\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">git add</text><line x1=\"200\" y1=\"80\" x2=\"130\" y2=\"80\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow6b)\"/><text x=\"165\" y=\"103\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">restore --staged</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"68\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">ステージング</text><text x=\"260.0\" y=\"80\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">エリア</text><defs><marker id=\"arrow6a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker><marker id=\"arrow6b\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">restore --stagedは、addだけを打ち消す操作</text></svg>",
+    "practice_note": "実例未確認(loop-engineering-hub内にgit restore --stagedに関する具体的な記録は見つからなかった)。",
+    "difficulty": 2
+  },
+  {
+    "id": "github-007",
+    "category": "GitHub",
+    "subtopic": "ブランチとマージ(fast-forward/コンフリクト)",
+    "key_concept": "fast-forwardは、ポインタを進めるだけの統合",
+    "question": "featureブランチを作成してから、mainには一切新しいコミットが追加されていない。この状態でfeatureをmainにマージすると、どうなるか。",
+    "choices": [
+      {
+        "text": "fast-forwardマージとなり、mainのポインタがfeatureの先端に進むだけで、マージコミットは作られない",
+        "why_right": "mainが分岐後に進んでいないため、featureの履歴はmainの延長線上にそのまま乗る。Gitは新しいコミットを作る必要がなく、mainの参照を単にfeatureの先端に進めるだけで統合が完了する。"
+      },
+      {
+        "text": "必ずマージコミットが作られ、2つの親を持つコミットが履歴に残る",
+        "why_wrong": "マージコミットが必要になるのは、mainとfeatureの両方が分岐後にそれぞれ進んでいる場合。今回のようにmain側が一切進んでいない場合はfast-forwardになり、マージコミットは作られない。"
+      },
+      {
+        "text": "コンフリクトが発生し、手動での解決が必須になる",
+        "why_wrong": "コンフリクトは同じ箇所を両ブランチが別々に変更した場合に起きる。mainが分岐後に進んでいない今回のケースでは競合する変更が無く、コンフリクトは発生しない。"
+      },
+      {
+        "text": "featureブランチの内容がすべて破棄され、mainの内容だけが残る",
+        "why_wrong": "マージは変更を破棄する操作ではなく統合する操作。featureの内容が消えることはなく、むしろfast-forwardではfeatureの履歴がそのままmainの一部になる。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "fast-forwardマージは、分岐元のブランチ(main)が分岐後に一切進んでいない場合にだけ起こる特別なケースである。この場合、featureの履歴はmainの続きとして直線上に並んでいるため、Gitは新しい統合用のコミットを作る必要がなく、mainというラベル(参照)をfeatureの先端に付け替えるだけで済む。逆にmain側も分岐後に進んでいれば、両者の変更を1つにまとめるためのマージコミットが必要になる。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"fast-forwardマージでmainのポインタがfeatureの先端に進むことを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">main</text><text x=\"70.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">(旧位置)</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow7)\"/><text x=\"165\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">fast-forward</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">feature</text><text x=\"260.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">(先端)</text><defs><marker id=\"arrow7\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">fast-forwardは、ポインタを進めるだけの統合</text></svg>",
+    "practice_note": "実例未確認(loop-engineering-hub内にfast-forwardマージに関する具体的な記録は見つからなかった)。",
+    "difficulty": 1
+  },
+  {
+    "id": "github-008",
+    "category": "GitHub",
+    "subtopic": "ブランチとマージ(fast-forward/コンフリクト)",
+    "key_concept": "マージコミットは、親を2つ持つ統合コミット",
+    "question": "mainとfeatureの両方が、分岐後にそれぞれ別のコミットを積んでいる状態でfeatureをmainにマージした。この場合に何が起こるか。",
+    "choices": [
+      {
+        "text": "両方の変更履歴をまとめる「マージコミット」が新しく作られ、2つの親コミットを持つ",
+        "why_right": "mainとfeatureの両方が分岐後に進んでいるため、単純にポインタを進めるだけでは両方の変更を反映できない。Gitは両方の履歴を親として持つ新しいコミット(マージコミット)を作ることで統合する。"
+      },
+      {
+        "text": "fast-forwardマージとなり、マージコミットは作られない",
+        "why_wrong": "fast-forwardが成立するのはmain側が分岐後に一切進んでいない場合のみ。今回はmain側も進んでいるため、単純なポインタ移動では統合できない。"
+      },
+      {
+        "text": "featureの変更はすべて無視され、mainの内容だけが残る",
+        "why_wrong": "マージは両方の変更を統合する操作であり、片方の変更だけを残して他方を無視することはない(コンフリクトが起きた場合も、解決すれば両方の意図した変更が反映される)。"
+      },
+      {
+        "text": "mainとfeatureの両方が削除され、新しいブランチに置き換わる",
+        "why_wrong": "マージによって既存のブランチが削除されることはない。統合後もmain・featureという名前のブランチはそのまま存在し続ける(featureを削除するかは別途の判断)。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "マージコミットは、通常のコミットと違い親コミットを2つ持つ特殊なコミットである。mainとfeatureの両方が分岐後に別々の変更を積んでいる場合、それぞれの履歴は分岐したまま独立して存在しているため、単純にポインタを進めるだけでは片方の変更しか反映できない。そこでGitは両方の履歴を親として参照する新しいコミットを作り、そのコミットの内容として両方の変更を統合したスナップショットを記録する。",
+    "diagram": "<svg viewBox=\"0 0 340 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"mainとfeatureの両方を親に持つマージコミットが作られることを示す図\"><rect x=\"10\" y=\"20\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70\" y=\"38\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">main</text><text x=\"70\" y=\"50\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(分岐後)</text><rect x=\"210\" y=\"20\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"270\" y=\"38\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">feature</text><text x=\"270\" y=\"50\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(分岐後)</text><rect x=\"110\" y=\"100\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"170\" y=\"118\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">マージ</text><text x=\"170\" y=\"130\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">コミット</text><line x1=\"70\" y1=\"60\" x2=\"170\" y2=\"100\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow8)\"/><text x=\"110\" y=\"80\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">親1</text><line x1=\"270\" y1=\"60\" x2=\"290\" y2=\"100\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow8)\"/><text x=\"290\" y=\"80\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">親2</text><defs><marker id=\"arrow8\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"230\" y=\"175\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">マージコミットは、親を2つ持つ統合コミット</text></svg>",
+    "practice_note": "実例未確認(loop-engineering-hub内にマージコミットの仕組みに関する具体的な記録は見つからなかった)。",
+    "difficulty": 2
+  },
+  {
+    "id": "github-009",
+    "category": "GitHub",
+    "subtopic": "ブランチとマージ(fast-forward/コンフリクト)",
+    "key_concept": "コンフリクトは、同じ箇所への変更の競合",
+    "question": "mainとfeatureの両方で、同じファイルの同じ行を別々の内容に変更していた。この状態でマージすると何が起こるか。",
+    "choices": [
+      {
+        "text": "コンフリクトが発生し、どちらの内容を採用するかをユーザーが手動で決める必要がある",
+        "why_right": "Gitは同じ箇所に対する2つの異なる変更のどちらを正とすべきか自動判断できないため、その箇所をコンフリクトとしてマークし、人間に解決を委ねる。"
+      },
+      {
+        "text": "後から実行した側の変更が自動的に優先され、上書きされる",
+        "why_wrong": "Gitは変更の新旧や実行順だけで自動的に片方を優先することはしない。同じ箇所への競合は必ずコンフリクトとして検出される。"
+      },
+      {
+        "text": "先にコミットされた側の変更が自動的に優先され、上書きされる",
+        "why_wrong": "コミットの前後関係だけで自動的にどちらかを採用する仕組みはない。同じ箇所への競合はコンフリクトとして扱われる。"
+      },
+      {
+        "text": "両方の変更が自動的に1つの行にまとめられ、コンフリクトは発生しない",
+        "why_wrong": "同じ行に対する異なる変更を自動的に合成する機能はない。異なる行への変更であれば自動統合されることもあるが、同じ行同士の競合はコンフリクトになる。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "コンフリクトは、両方のブランチが同じ行(同じ変更箇所)に対して異なる変更を加えた場合に起きる。Gitは行単位で差分を追跡しており、変更箇所が重なっていなければ自動的に両方を取り込めるが、重なった箇所についてはどちらの内容が正しいかを判断する材料を持たない。そのためGitはその箇所をマーカー(<<<<<<<など)で挟んでファイルに残し、作業者が意図を踏まえて手動で解決することを求める。",
+    "diagram": "<svg viewBox=\"0 0 340 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"mainとfeatureが同じ行を変更しコンフリクトになることを示す図\"><rect x=\"10\" y=\"20\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70\" y=\"38\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">feature側</text><text x=\"70\" y=\"50\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">の変更</text><rect x=\"210\" y=\"20\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"270\" y=\"38\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">main側</text><text x=\"270\" y=\"50\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">の変更</text><rect x=\"110\" y=\"100\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"170\" y=\"118\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">同じ行</text><text x=\"170\" y=\"130\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(競合)</text><line x1=\"70\" y1=\"60\" x2=\"170\" y2=\"100\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow9)\"/><text x=\"110\" y=\"80\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">変更A</text><line x1=\"270\" y1=\"60\" x2=\"290\" y2=\"100\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow9)\"/><text x=\"290\" y=\"80\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">変更B</text><defs><marker id=\"arrow9\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"230\" y=\"175\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">コンフリクトは、同じ箇所への変更の競合</text></svg>",
+    "practice_note": "実例未確認(loop-engineering-hub内にコンフリクトの仕組みそのものに関する具体的な記録は見つからなかった)。",
+    "difficulty": 2
+  },
+  {
+    "id": "github-010",
+    "category": "GitHub",
+    "subtopic": "ブランチとマージ(fast-forward/コンフリクト)",
+    "key_concept": "共有ファイルへの並行追記は、コンフリクトの温床",
+    "question": "複数のPRを並行して進めており、どちらのPRでもSTATE.mdの同じセクションに追記していた。1本目をマージした後、2本目のPRで何が起きやすいか。",
+    "choices": [
+      {
+        "text": "2本目のPRをmainに追従させる際、STATE.mdの同じ箇所でコンフリクトが起きやすい",
+        "why_right": "STATE.mdのような全体共有ファイルは変更が集中しやすく、複数PRが同じセクション(例: 未完了タスク一覧)に追記すると、行の挿入位置が重なりコンフリクトになりやすい。"
+      },
+      {
+        "text": "2本目のPRは自動的にmainの最新のSTATE.mdで上書きされ、2本目の追記内容は消える",
+        "why_wrong": "自動的に片方が優先されて無言で消えることはない。競合する変更はコンフリクトとして検出され、解決が必要になる。"
+      },
+      {
+        "text": "STATE.mdはmainブランチでしか変更できないため、そもそも2本目のPRでは編集できない",
+        "why_wrong": "ファイルへの編集自体はどのブランチでも可能。問題になるのはマージ時に変更箇所が重なることであり、編集操作そのものが禁止されるわけではない。"
+      },
+      {
+        "text": "STATE.mdはコミット対象から自動的に除外されるため、2本目のPRの変更は反映されない",
+        "why_wrong": "STATE.mdは通常のテキストファイルとして追跡・コミット対象であり、.gitignore等で特別に除外される運用はない。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "STATE.mdのように、進捗や判断記録を書き足していく全体共有ファイルは、案件が進むほど複数の作業が同じセクションに追記したくなる性質を持つ。Gitは行単位で変更を追跡するため、2つのPRが同じ行の近くに別々の追記をすると、片方をマージした後にもう片方をmainに追従させる段階で、挿入位置が重なりコンフリクトとして検出されやすい。これを避けるには、共有ファイルを更新するPRは並行させず、1本ずつマージしてから次に着手する運用が有効である。",
+    "diagram": "<svg viewBox=\"0 0 340 170\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"STATE.mdへの並行追記がmain追従時にコンフリクトになることを示す図\"><rect x=\"10\" y=\"20\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70\" y=\"38\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">PR1</text><text x=\"70\" y=\"50\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(STATE.md追記)</text><rect x=\"210\" y=\"20\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"270\" y=\"38\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">PR2</text><text x=\"270\" y=\"50\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(STATE.md追記)</text><rect x=\"110\" y=\"100\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"170\" y=\"118\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">main</text><text x=\"170\" y=\"130\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(STATE.md)</text><line x1=\"70\" y1=\"60\" x2=\"170\" y2=\"100\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow10)\"/><text x=\"110\" y=\"80\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">PR1マージ</text><line x1=\"270\" y1=\"60\" x2=\"290\" y2=\"100\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow10)\"/><text x=\"290\" y=\"80\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">PR2マージ(競合)</text><defs><marker id=\"arrow10\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"230\" y=\"175\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">共有ファイルへの並行追記は、コンフリクトの温床</text></svg>",
+    "practice_note": "STATE.mdのような全体共有ファイルは、複数PRが並行して更新すると必ずコンフリクトするため、1本のPRをマージしてから次のPRに着手する運用を基本とする、という記録がある。(出典: loop-engineering-hubのskill-src/salesforce-trial-builder/references/implementation-kickoff.md「2. PRの並行作業は避ける」節)",
+    "difficulty": 3
+  },
+  {
+    "id": "github-011",
+    "category": "GitHub",
+    "subtopic": "取り消し系(reset/revert/stash)",
+    "key_concept": "revertは、履歴を残したまま変更を打ち消す",
+    "question": "すでにリモートにpush済みで、他の人も参照している共有ブランチ上で、直前のコミットの変更を取り消したい。適切な操作はどれか。",
+    "choices": [
+      {
+        "text": "git revertで打ち消しコミットを作る",
+        "why_right": "revertは元のコミットを削除せず、その変更を打ち消す新しいコミットを追加する。共有ブランチの履歴を書き換えないため、他の人の作業に影響を与えずに安全に取り消せる。"
+      },
+      {
+        "text": "git reset --hardで直前のコミットごと削除する",
+        "why_wrong": "reset --hardは履歴そのものを書き換えて過去のコミットを無かったことにする。すでに他の人が同じ履歴を取得している共有ブランチでこれを行うと、履歴の食い違い(強制pushの必要等)を引き起こす。"
+      },
+      {
+        "text": "git stashで変更を退避する",
+        "why_wrong": "stashは未コミットの変更を一時的に退避する操作であり、すでにコミット済みの変更を取り消す手段ではない。"
+      },
+      {
+        "text": "git cherry-pickで別のコミットを持ってくる",
+        "why_wrong": "cherry-pickは特定のコミットを別のブランチに追加移植する操作で、既存コミットの変更を取り消す操作ではない。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "revertとreset --hardはどちらも「変更を無かったことにしたい」という目的に使われるが、履歴に対する扱いが根本的に異なる。revertは過去のコミットをそのまま残し、その内容を打ち消す差分を持つ新しいコミットを履歴の末尾に追加する。一方reset --hardは、指定した地点より後のコミット自体を履歴から取り除いてしまう。共有ブランチではすでに他者がその履歴を取得しているため、履歴を書き換えるreset --hardは食い違いの原因になり、履歴を追加するだけのrevertの方が安全である。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"revertが元のコミットを残したまま打ち消しコミットを追加することを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">元の</text><text x=\"70.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">コミット</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow11)\"/><text x=\"165\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">git revert</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">打ち消し</text><text x=\"260.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">コミット</text><defs><marker id=\"arrow11\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">revertは、履歴を残したまま変更を打ち消す</text></svg>",
+    "practice_note": "実例未確認(loop-engineering-hub内にgit revertの運用に関する具体的な記録は見つからなかった)。",
+    "difficulty": 2
+  },
+  {
+    "id": "github-012",
+    "category": "GitHub",
+    "subtopic": "取り消し系(reset/revert/stash)",
+    "key_concept": "stashは、未コミットの変更を一時退避する棚",
+    "question": "作業中のファイルに未コミットの変更が残っている状態で、急ぎ別のブランチに切り替えて別の作業をしたい(今の変更はまだコミットしたくない)。適切な操作はどれか。",
+    "choices": [
+      {
+        "text": "git stashで変更を一時的に退避してからブランチを切り替える",
+        "why_right": "stashは未コミットの変更を一時的に退避し、作業ディレクトリを直前のコミット時点のきれいな状態に戻す。ブランチ切り替え後、git stash popで退避した変更を呼び戻せる。"
+      },
+      {
+        "text": "git commitでいったん確定させてからブランチを切り替える",
+        "why_wrong": "「まだコミットしたくない」という要件に反する。作業が中途半端な内容を無理にコミットすることになり、後で履歴を整理する手間が増える。"
+      },
+      {
+        "text": "git resetで変更を削除してからブランチを切り替える",
+        "why_wrong": "resetは変更を消してしまう操作であり、後で作業を再開できなくなる。「変更を残したまま」という要件を満たさない。"
+      },
+      {
+        "text": "git branchで新しいブランチを作ってから切り替える",
+        "why_wrong": "新しいブランチを作るだけでは、未コミットの変更は作業ディレクトリに残ったままになり、そのまま持ち越されてしまう。今回のような「元のブランチをきれいな状態に戻したい」要件には合わない。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "stashは、コミットするほどではないが今すぐは扱いたくない変更を、一時的な保管場所に退避させる仕組みである。stashを実行すると作業ディレクトリは直前のコミット時点の状態に戻り、退避した変更はスタック状に積まれる。後でstash popを実行すると、退避した変更を作業ディレクトリに戻せる。ただしstash -uのように未追跡ファイルまで含めて退避する場合、gitが本来追跡しない要素(空ディレクトリ等)の扱いには注意が必要になる。",
+    "diagram": "<svg viewBox=\"0 0 340 150\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"stashが未コミットの変更を一時退避しpopで戻すことを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"68\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">作業</text><text x=\"70.0\" y=\"80\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">ディレクトリ</text><line x1=\"130\" y1=\"64\" x2=\"200\" y2=\"64\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow12a)\"/><text x=\"165\" y=\"46\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">git stash</text><line x1=\"200\" y1=\"80\" x2=\"130\" y2=\"80\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow12b)\"/><text x=\"165\" y=\"103\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">stash pop</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"68\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">stash</text><text x=\"260.0\" y=\"80\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(退避先)</text><defs><marker id=\"arrow12a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker><marker id=\"arrow12b\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">stashは、未コミットの変更を一時退避する棚</text></svg>",
+    "practice_note": "sfdxプロジェクトで`git stash -u`を使うと、gitが追跡しない空ディレクトリ(force-app配下等)がstash実行時に削除され、ブランチ操作を挟むと作業ツリーから消えてデプロイが全滅した実例がある。(出典: loop-engineering-hubのskill-src/salesforce-trial-builder/references/setup_gotchas.md 13節「gitは空ディレクトリを追跡しない」)",
+    "difficulty": 1
+  },
+  {
+    "id": "github-013",
+    "category": "GitHub",
+    "subtopic": "取り消し系(reset/revert/stash)",
+    "key_concept": "reset --softは、履歴だけ戻し変更内容は残す",
+    "question": "直前の2つのコミットを1つにまとめ直したいが、その変更内容(ファイルの中身)はそのまま作業ディレクトリに残しておきたい。適切な操作はどれか。",
+    "choices": [
+      {
+        "text": "git reset --soft HEAD~2 の後、あらためてgit commitする",
+        "why_right": "reset --softはコミット履歴だけを指定位置まで巻き戻し、ステージングエリアと作業ディレクトリの内容はそのまま保持する。2つ分の変更がステージング済みの状態で残るため、あらためて1回commitすれば1つのコミットにまとめ直せる。"
+      },
+      {
+        "text": "git reset --hard HEAD~2",
+        "why_wrong": "--hardはコミット履歴だけでなく、ステージングエリアと作業ディレクトリの内容もすべて指定位置の状態に戻してしまう。直前2つのコミットで加えた変更内容そのものが失われ、「残しておきたい」という要件に反する。"
+      },
+      {
+        "text": "git revert HEAD~2..HEAD",
+        "why_wrong": "revertは打ち消しコミットを追加する操作であり、複数のコミットを1つにまとめ直す(履歴の数を減らす)操作ではない。むしろ打ち消し用のコミットが増える。"
+      },
+      {
+        "text": "git stashで2つ分の変更を退避する",
+        "why_wrong": "stashは未コミットの変更を退避する操作であり、すでにコミット済みの履歴を書き換える(まとめ直す)操作ではない。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "git resetには影響範囲の異なる3つのモードがあり、--softはコミット履歴の位置だけを巻き戻し、ステージングエリアと作業ディレクトリには触れない。これに対し--mixed(デフォルト)はステージングエリアまで、--hardは作業ディレクトリまで指定位置の状態に戻す。直前のコミットで加えた変更内容を保持したまま履歴だけをやり直したい場合は、影響範囲が最も狭い--softを使い、変更内容がステージング済みのまま残った状態から改めてcommitし直す。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"reset --softがコミット履歴だけを巻き戻すことを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">コミットB</text><text x=\"70.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">(2つ前)</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow13)\"/><text x=\"165\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">reset --soft</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">コミットA</text><text x=\"260.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">(現在)</text><defs><marker id=\"arrow13\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">reset --softは、履歴だけ戻し変更内容は残す</text></svg>",
+    "practice_note": "実例未確認(loop-engineering-hub内にgit reset --softに関する具体的な記録は見つからなかった)。",
+    "difficulty": 3
+  },
+  {
+    "id": "github-014",
+    "category": "GitHub",
+    "subtopic": "リモートと認証(origin/HTTPSとSSH/403)",
+    "key_concept": "originは、リモートリポジトリの別名にすぎない",
+    "question": "git cloneでリポジトリを取得すると、自動的に「origin」という名前のリモートが登録される。originとは何か。",
+    "choices": [
+      {
+        "text": "clone元のリモートリポジトリを指すエイリアス(別名)",
+        "why_right": "originは特別な予約語ではなく、cloneした際にGitが自動的に付ける「リモートリポジトリの別名」の慣習的な名前である。git remote -vで実際のURLを確認できる。"
+      },
+      {
+        "text": "ローカルリポジトリのmainブランチと同じもの",
+        "why_wrong": "originはリモート(別の場所にあるリポジトリ)を指す名前であり、ローカルのブランチとは別の概念。origin/mainのように組み合わせて初めて「リモートのmainブランチの追跡ブランチ」を指す。"
+      },
+      {
+        "text": "GitHub社が提供する特別なサーバーの固定名",
+        "why_wrong": "originはGit自体の予約語やGitHub固有の仕組みではなく、単なる別名(エイリアス)。任意の名前に変更したり、複数のリモートを別名で追加したりできる。"
+      },
+      {
+        "text": "コミット履歴の先頭(最初のコミット)を指すポインタ",
+        "why_wrong": "それはHEADや特定のコミットハッシュが担う役割であり、originはリモートリポジトリの場所を指す名前であって、コミットを指すポインタではない。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "リモートは「他の場所にあるリポジトリの参照先」を管理する仕組みで、originという名前自体には特別な機能はなく、git clone実行時にGitが慣習的に付けるデフォルトの名前に過ぎない。git remote add <好きな名前> <URL>で別名のリモートを追加することもでき、複数のリモート(例: originとupstream)を使い分けることも一般的である。origin/mainのようにスラッシュで組み合わせた表記は「originというリモートのmainブランチを追跡するブランチ」を意味する。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"originがリモートリポジトリを指す別名であることを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">ローカル</text><text x=\"70.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">リポジトリ</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow14)\"/><text x=\"165\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">origin</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">リモート</text><text x=\"260.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">リポジトリ</text><defs><marker id=\"arrow14\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">originは、リモートリポジトリの別名にすぎない</text></svg>",
+    "practice_note": "実例未確認(loop-engineering-hub内にリモート名(origin)の運用に関する具体的な記録は見つからなかった)。",
+    "difficulty": 1
+  },
+  {
+    "id": "github-015",
+    "category": "GitHub",
+    "subtopic": "リモートと認証(origin/HTTPSとSSH/403)",
+    "key_concept": "HTTPS/SSHは、認証の仕組みが違うだけ",
+    "question": "GitHubへのpush時の認証方式として、HTTPSとSSHという2つの選択肢がある。両者の違いとして正しいものはどれか。",
+    "choices": [
+      {
+        "text": "HTTPSはトークン(パスワードの代わり)、SSHは鍵ペアを使って認証する方式の違いである",
+        "why_right": "HTTPS方式は多くの場合パーソナルアクセストークン等を使い、SSH方式は事前に登録した公開鍵・秘密鍵のペアを使う。認証の仕組みが異なるだけで、どちらもGitHubへの同じ操作(clone/push/pull)を行える。"
+      },
+      {
+        "text": "HTTPSは読み取り専用で、SSHでしか変更をpushできない",
+        "why_wrong": "HTTPS経由でも認証さえ通れば通常どおりpushできる。読み取り専用かどうかは通信方式ではなく、認証情報に紐づく権限の問題。"
+      },
+      {
+        "text": "SSHは無料アカウント、HTTPSは有料アカウントでのみ使える",
+        "why_wrong": "どちらの認証方式も、アカウントの料金プランとは無関係にGitHubで利用できる。"
+      },
+      {
+        "text": "HTTPSとSSHは同じ鍵ファイルを共有しており、設定の手間に違いはない",
+        "why_wrong": "HTTPSはトークン、SSHは鍵ペアと、それぞれ別の認証情報・別の設定手順(鍵の生成・登録等)が必要であり、同じ鍵ファイルを共有するわけではない。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "HTTPSとSSHは、GitHubのサーバーに「自分が誰であるか」を証明するための認証方式の違いである。HTTPSはURLが`https://`から始まり、多くの場合パスワードの代わりにパーソナルアクセストークンを使って認証する。SSHはURLが`git@github.com:...`のような形式になり、事前にローカルで生成した秘密鍵と、GitHub側に登録した公開鍵のペアで認証する。どちらの方式でも、認証さえ通ればclone・push・pullといった操作の内容自体に違いはない。",
+    "diagram": "<svg viewBox=\"0 0 340 150\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"HTTPSとSSHがそれぞれ別の認証方式であることを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"74\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">ローカル</text><line x1=\"130\" y1=\"64\" x2=\"200\" y2=\"64\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow15a)\"/><text x=\"165\" y=\"46\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">HTTPS(トークン)</text><line x1=\"200\" y1=\"80\" x2=\"130\" y2=\"80\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow15b)\"/><text x=\"165\" y=\"103\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">SSH(鍵ペア)</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"74\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">GitHub</text><defs><marker id=\"arrow15a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker><marker id=\"arrow15b\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">HTTPS/SSHは、認証の仕組みが違うだけ</text></svg>",
+    "practice_note": "実例未確認(loop-engineering-hub内にHTTPS/SSH認証方式そのものに関する具体的な記録は見つからなかった)。",
+    "difficulty": 1
+  },
+  {
+    "id": "github-016",
+    "category": "GitHub",
+    "subtopic": "リモートと認証(origin/HTTPSとSSH/403)",
+    "key_concept": "403は、認証済みだが操作が許可されない印",
+    "question": "マージ済みのリモートブランチを`git push origin --delete <ブランチ名>`で削除しようとしたところ、HTTP 403エラーで拒否された。最も可能性が高い原因はどれか。",
+    "choices": [
+      {
+        "text": "リポジトリ側の設定(ブランチ保護やActions/Appの権限設定)により、削除操作が許可されていない",
+        "why_right": "403は「認証はできているが、その操作を行う権限が無い」ことを示すエラー。ユーザー自身の認証情報が誤っているわけではなく、リポジトリ側の権限設定によってブランチ削除という操作そのものがブロックされているケースがある。"
+      },
+      {
+        "text": "ブランチ名のスペルを間違えている",
+        "why_wrong": "存在しないブランチ名を指定した場合、通常は「そのようなリファレンスは無い」という趣旨のエラーになり、403(権限エラー)とは異なる種類のエラーになる。"
+      },
+      {
+        "text": "リモートリポジトリのURLをHTTPSからSSHに変更すれば必ず解決する",
+        "why_wrong": "403は認証方式(HTTPS/SSH)の選択とは別の、権限設定の問題であることが多い。方式を変えるだけで自動的に解決するとは限らない。"
+      },
+      {
+        "text": "ローカルにそのブランチのコミットが1つも無いため発生する",
+        "why_wrong": "ブランチ削除はリモート側の参照を消す操作であり、ローカルにそのブランチの実体があるかどうかは削除権限の有無とは無関係。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "HTTPのステータスコードには意味の違いがあり、401は「認証情報が無効(誰かを証明できていない)」、403は「認証はできているが、その先の操作を許可されていない」ことを示す。ブランチ削除における403は、GitHub側のリポジトリ設定(ブランチ保護ルールや、操作を実行しているアプリ・Botに付与された権限の範囲)が原因になっていることが多く、認証情報を入れ直しても解決しない。設定側で権限を見直すか、GitHubのWeb UIから手動で削除する、といった代替手段が必要になる。",
+    "diagram": "<svg viewBox=\"0 0 340 150\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"ブランチ削除要求がリポジトリ設定により403で拒否されることを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"74\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">クライアント</text><line x1=\"130\" y1=\"64\" x2=\"200\" y2=\"64\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow16a)\"/><text x=\"165\" y=\"46\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">delete要求</text><line x1=\"200\" y1=\"80\" x2=\"130\" y2=\"80\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow16b)\"/><text x=\"165\" y=\"103\" text-anchor=\"middle\" font-size=\"9\" fill=\"currentColor\">403拒否</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"68\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">GitHub</text><text x=\"260.0\" y=\"80\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">(権限設定)</text><defs><marker id=\"arrow16a\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker><marker id=\"arrow16b\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">403は、認証済みだが操作が許可されない印</text></svg>",
+    "practice_note": "リポジトリ設定でAutomatically delete head branchesを有効化する対処が定められている、作業ブランチの削除が権限エラーで失敗する既知の問題の実例がある。(出典: loop-engineering-hubのNEW_PROJECT_CHECKLIST.md「PRトリガーRoutineの登録」ステップの完了条件節)",
+    "difficulty": 1
+  },
+  {
+    "id": "github-017",
+    "category": "GitHub",
+    "subtopic": "PRとレビュー(squash/head SHA)",
+    "key_concept": "squashは、複数コミットを1つにまとめて統合",
+    "question": "PRを「squash」方式でマージした。mainの履歴には何が追加されるか。",
+    "choices": [
+      {
+        "text": "PR内の複数コミットがまとめられた、1つの新しいコミットが追加される",
+        "why_right": "squashマージは、PRブランチに積まれた複数のコミットを1つの差分にまとめ、それを1つの新しいコミットとしてmainに追加する。PRブランチ側の個々のコミット履歴はmainには持ち込まれない。"
+      },
+      {
+        "text": "PRブランチのコミット履歴がすべてそのままmainに複製される",
+        "why_wrong": "それは通常のマージ(merge commit)の場合の挙動に近い。squashはあえて個々のコミットをまとめて1つにする方式であり、途中のコミット履歴は個別には残らない。"
+      },
+      {
+        "text": "マージコミット(親を2つ持つコミット)が作られる",
+        "why_wrong": "親を2つ持つマージコミットが作られるのは通常のmerge方式の場合。squashマージで作られるのは親が1つの通常のコミットである。"
+      },
+      {
+        "text": "PRブランチの内容はmainに反映されず、PRがクローズされるだけになる",
+        "why_wrong": "squashマージは通常のマージと同様に、PRの変更内容をmainに反映させたうえでPRをマージ済みとしてクローズする。内容が反映されないということはない。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "squashマージは、PR上でのやり直しや修正コミット(レビュー対応等)を含む複数コミットの履歴を、mainには持ち込まずに1つの完成形コミットとしてまとめる方式である。作業過程の細かい履歴はPR自体には残るが、mainのコミット履歴は「1つの機能追加=1コミット」というシンプルな形に保たれる。この方式では、mainにマージされた後のコミットはPRブランチの最後のコミットとは別物(新しいコミットハッシュ)になる点に注意が必要である。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"squashマージによりPRの複数コミットが1コミットにまとまることを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">PRの</text><text x=\"70.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">複数コミット</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow17)\"/><text x=\"165\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">squash merge</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">main</text><text x=\"260.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">(1コミット)</text><defs><marker id=\"arrow17\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">squashは、複数コミットを1つにまとめて統合</text></svg>",
+    "practice_note": "レビュー対象は常に「PR全体差分」であり、baseブランチをsquashでまとめ直した場合もまとめ直した後の全体差分を対象にする、という運用ルールがある。(出典: loop-engineering-hubのskill-src/loop-operating-rules/SKILL.md「手動再レビューの実施方法」節)",
+    "difficulty": 2
+  },
+  {
+    "id": "github-018",
+    "category": "GitHub",
+    "subtopic": "PRとレビュー(squash/head SHA)",
+    "key_concept": "head SHAは、レビュー対象コミットを固定する印",
+    "question": "PRへの手動レビュー結果コメントには「head <SHA>」という見出しが付けられる運用になっている。マージ判断の際にこのSHAを確認する目的として最も適切なものはどれか。",
+    "choices": [
+      {
+        "text": "レビュー後に追加pushが無かったか(レビュー対象のコミットが今のPRの状態と一致しているか)を確認するため",
+        "why_right": "PRのhead(先端)は追加pushのたびに新しいコミットに進む。レビュー時点のSHAと現在のPRのhead SHAが一致していれば、レビュー後に無断で内容が変わっていないことを保証できる。一致しなければ、そのレビューはすでに古い状態を対象にしたものとみなす必要がある。"
+      },
+      {
+        "text": "そのSHAを使ってPRをマージするコマンドの引数に指定する必要があるため",
+        "why_wrong": "通常のマージ操作(squash/merge/rebase)自体にはSHAの指定は必須ではない。SHAはあくまで「どの時点を確認したか」を記録する識別子として使われている。"
+      },
+      {
+        "text": "SHAの値が大きいほど、より多くのレビュー指摘が解消されていることを表すため",
+        "why_wrong": "コミットハッシュ(SHA)はコミット内容から計算される値であり、大小関係やレビュー指摘の解消度合いとは無関係。"
+      },
+      {
+        "text": "SHAが一致していれば、コンフリクトが絶対に発生しないことを保証するため",
+        "why_wrong": "head SHAの一致確認は「レビュー対象と現状が同じである」ことの確認であり、mainとの間でコンフリクトが起きるかどうかとは別の話。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "PRのhead SHAは、そのPRブランチの最新コミットを一意に識別する値であり、追加pushがあるたびに新しいコミットのSHAに更新される。手動レビューは特定時点のコード(あるコミット)に対して行われるため、レビュー結果コメントに「どのSHAを対象にレビューしたか」を明記しておくことで、後から「そのレビューは今のPRの状態にまだ当てはまるか」を機械的に検証できる。マージ直前にPRの現在のhead SHAとレビュー見出しのSHAを突き合わせ、一致していなければ、レビュー後の追加pushがあったとみなして再レビューを行う。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"レビュー時点のhead SHAと現在のhead SHAを突き合わせることを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">レビュー時点</text><text x=\"70.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">のhead</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow18)\"/><text x=\"165\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">追加push?</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">現在の</text><text x=\"260.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">PRのhead</text><defs><marker id=\"arrow18\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">head SHAは、レビュー対象コミットを固定する印</text></svg>",
+    "practice_note": "マージ判断は、PRの現在のhead SHAが参照するレビューコメント見出しのSHAと一致していることを満たしてから行う、という運用ルールが定められている。(出典: loop-engineering-hubのskill-src/loop-operating-rules/SKILL.md「手動再レビューの実施方法」節)",
+    "difficulty": 3
+  },
+  {
+    "id": "github-019",
+    "category": "GitHub",
+    "subtopic": "PRとレビュー(squash/head SHA)",
+    "key_concept": "レビュー対象は、常にPR全体差分",
+    "question": "PRに追加pushした後、その追加pushぶんの差分だけをレビューすれば十分だろうか。",
+    "choices": [
+      {
+        "text": "不十分。レビューはPR全体差分(baseとの差分全体)を対象にすべきである",
+        "why_right": "追加pushぶんだけを見ても、それ以前のコミットとの組み合わせで初めて生じる矛盾は見逃されやすい。マージされる実際の差分は「PR全体差分」であるため、レビューもそれに合わせて全体を対象にする必要がある。"
+      },
+      {
+        "text": "十分。追加pushぶんだけを見れば、PR全体の品質は保証できる",
+        "why_wrong": "追加pushぶんだけのレビューでは、それ以前のコミットとの整合性(用語の一貫性、既存コードとの重複等)を見落とす可能性がある。"
+      },
+      {
+        "text": "十分。むしろ全体を見直すと、すでに承認された箇所まで指摘対象になり非効率である",
+        "why_wrong": "効率の観点だけでレビュー範囲を狭めると、実際にmainに反映される差分全体の整合性を見逃すリスクの方が大きい。マージされるのはPR全体差分であることを踏まえるべき。"
+      },
+      {
+        "text": "追加pushぶんだけのレビューで十分だが、そのかわりコミットメッセージを詳しく書けば省略できる",
+        "why_wrong": "コミットメッセージの充実度と、コードの実際の差分内容を確認するレビューの必要性は別の話であり、片方で他方を代替することはできない。"
+      }
+    ],
+    "answer_index": 0,
+    "explanation": "PRが最終的にmainに取り込む変更は、個々のコミットの積み重ねではなく「baseブランチとPRブランチの間の差分全体」である。追加pushの回を重ねるたびにその差分ぶんだけをレビューしていくと、初期のコミットとの組み合わせで生じる矛盾や、全体を通して見て初めて気づく設計上の問題を見逃しやすくなる。そのため、追加pushへの再レビューであっても、対象は常にその時点でのPR全体差分にすることで、マージ直前の状態そのものを検証したことになる。",
+    "diagram": "<svg viewBox=\"0 0 340 140\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"レビュー対象が常にPR全体差分であることを示す図\"><rect x=\"10\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"70.0\" y=\"74\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">base</text><line x1=\"130\" y1=\"70\" x2=\"200\" y2=\"70\" stroke=\"currentColor\" stroke-width=\"2\" marker-end=\"url(#arrow19)\"/><text x=\"165\" y=\"48\" text-anchor=\"middle\" font-size=\"10\" fill=\"currentColor\">PR全体差分</text><rect x=\"200\" y=\"50\" width=\"120\" height=\"40\" rx=\"6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><text x=\"260.0\" y=\"66\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">PRの現在の</text><text x=\"260.0\" y=\"82\" text-anchor=\"middle\" font-size=\"11\" fill=\"currentColor\">head</text><defs><marker id=\"arrow19\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"165\" y=\"125\" text-anchor=\"middle\" font-size=\"12\" fill=\"currentColor\">レビュー対象は、常にPR全体差分</text></svg>",
+    "practice_note": "レビュー対象は常に「PR全体差分」(追加pushぶんの差分だけではない)、baseブランチをsquashでまとめ直した場合もまとめ直した後の全体差分を対象にする、という運用ルールがある。(出典: loop-engineering-hubのskill-src/loop-operating-rules/SKILL.md「手動再レビューの実施方法」節)",
+    "difficulty": 2
   }
 ]
