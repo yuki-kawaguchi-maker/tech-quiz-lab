@@ -89,6 +89,9 @@
     color: var(--color-muted);
     border-color: rgba(117, 117, 117, 0.4);
   }
+  button.back-btn {
+    margin-top: 24px;
+  }
   button:disabled {
     opacity: 0.5;
     cursor: default;
@@ -343,7 +346,7 @@
     <p id="daily-complete-gauge-text"></p>
     <p id="daily-complete-streak-text"></p>
     <p class="quiz-meta">続けたい場合は、トップの「自由に選んで解く」から追加で出題できます。</p>
-    <button type="button" class="primary" id="daily-complete-back-btn">トップへ戻る</button>
+    <button type="button" class="secondary-muted back-btn" id="daily-complete-back-btn">トップへ戻る</button>
   </main>
 
   <main id="screen-zukan" hidden>
@@ -351,7 +354,7 @@
     <p class="quiz-meta">正解したことのある問題が公開されます。まだ正解していない問題は灰色の空きマスです。</p>
     <div id="zukan-category-summary"></div>
     <div id="zukan-content"></div>
-    <button type="button" id="zukan-back-btn" class="secondary-muted">トップへ戻る</button>
+    <button type="button" id="zukan-back-btn" class="secondary-muted back-btn">トップへ戻る</button>
   </main>
 
   <main id="screen-zukan-detail" hidden>
@@ -359,7 +362,7 @@
     <div class="diagram-box" id="zukan-detail-diagram"></div>
     <div class="explanation-box" id="zukan-detail-explanation"></div>
     <div class="practice-note-box" id="zukan-detail-practice-note"></div>
-    <button type="button" id="zukan-detail-back-btn" class="secondary-muted">図鑑に戻る</button>
+    <button type="button" id="zukan-detail-back-btn" class="secondary-muted back-btn">図鑑に戻る</button>
   </main>
 
   <main id="screen-quiz" hidden>
@@ -838,25 +841,26 @@
        (問題バンク全体が20問未満の場合を除く) */
     var newTarget = DAILY_TOTAL - reviewPicks.length;
 
-    /* 2. レベル方針: 初級の正答率が80%未満(またはデータ無し)なら初級優先、
-       80%以上なら中級を半分以上混ぜる(「半分」は新規枠newTarget基準) */
+    /* 2. レベル方針: 初級の正答率が80%未満(またはデータ無し)なら新規枠の最低7割を
+       初級から取り、80%以上なら中級を半分以上にする。カテゴリ上限より先に適用する
+       (「3b」でカテゴリ上限を無視して確保し、上限は「4」以降の残り枠から適用する) */
     var lvl1 = progress.byLevel[1];
     var lvl1Acc = (lvl1 && lvl1.answered > 0) ? (lvl1.correct / lvl1.answered) : null;
     var preferLevel1 = lvl1Acc === null || lvl1Acc < 0.8;
-    var minLevel2 = preferLevel1 ? 0 : Math.ceil(newTarget / 2);
+    var preferredLevel = preferLevel1 ? 1 : 2;
+    var levelQuota = preferLevel1 ? Math.ceil(newTarget * 0.7) : Math.ceil(newTarget / 2);
 
-    /* 3. 未出題の候補を、カテゴリの正答率が低い順(未経験カテゴリ優先)に並べる */
+    /* 3. 未出題の候補を、カテゴリの正答率が低い順(未経験カテゴリ優先)に並べる。
+       同率の場合は優先レベルを先に出す */
     var unanswered = questions.filter(function (q) {
       return !usedIds[q.id] && !progress.questionStats[q.id];
     });
     unanswered.sort(function (a, b) {
       var accDiff = categoryAccuracy(progress, a.category) - categoryAccuracy(progress, b.category);
       if (accDiff !== 0) return accDiff;
-      if (preferLevel1) {
-        var rankA = a.difficulty === 1 ? 0 : 1;
-        var rankB = b.difficulty === 1 ? 0 : 1;
-        if (rankA !== rankB) return rankA - rankB;
-      }
+      var rankA = a.difficulty === preferredLevel ? 0 : 1;
+      var rankB = b.difficulty === preferredLevel ? 0 : 1;
+      if (rankA !== rankB) return rankA - rankB;
       return 0;
     });
 
@@ -864,19 +868,19 @@
     var categoryCount = {};
     var remaining = newTarget;
 
-    if (!preferLevel1 && minLevel2 > 0) {
-      var level2Candidates = unanswered.filter(function (q) { return q.difficulty === 2; });
-      var otherCandidates = unanswered.filter(function (q) { return q.difficulty !== 2; });
-      var level2Quota = Math.min(minLevel2, remaining);
-      var level2LeftoverQuota = pickInto(newPicks, categoryCount, level2Candidates, level2Quota, DAILY_CATEGORY_CAP, usedIds);
-      var pickedFromLevel2 = level2Quota - level2LeftoverQuota;
-      remaining = remaining - pickedFromLevel2; /* サブ目標(中級最低数)の消化分だけ全体の残数を減らす */
-      remaining = pickInto(newPicks, categoryCount, otherCandidates.concat(level2Candidates), remaining, DAILY_CATEGORY_CAP, usedIds);
-    } else {
+    /* 3b. 優先レベル分を、カテゴリ上限を無視して先に確保する(レベル優先を
+       カテゴリ上限より先に適用するため) */
+    var preferredCandidates = unanswered.filter(function (q) { return q.difficulty === preferredLevel; });
+    var levelQuotaTarget = Math.min(levelQuota, remaining);
+    var levelQuotaLeftover = pickIntoNoCap(newPicks, preferredCandidates, levelQuotaTarget, usedIds);
+    remaining = remaining - (levelQuotaTarget - levelQuotaLeftover);
+
+    /* 4. 残り枠は、優先度順(未出題・カテゴリ正答率順)にカテゴリ上限10を適用して埋める */
+    if (remaining > 0) {
       remaining = pickInto(newPicks, categoryCount, unanswered, remaining, DAILY_CATEGORY_CAP, usedIds);
     }
 
-    /* 4. 未出題が尽きたら、既出題の中から誤答回数の多い順に再出題する */
+    /* 5. 未出題が尽きたら、既出題の中から誤答回数の多い順に再出題する */
     if (remaining > 0) {
       var answeredPool = questions.filter(function (q) {
         return !usedIds[q.id] && progress.questionStats[q.id];
@@ -887,12 +891,11 @@
       remaining = pickInto(newPicks, categoryCount, answeredPool, remaining, DAILY_CATEGORY_CAP, usedIds);
     }
 
-    /* 5. カテゴリ数が少なく上限に達して埋まりきらない場合は、上限を外して残りを埋める
-       (問題バンクが少数カテゴリに偏っている間の救済措置。カテゴリが増えれば発生しにくくなる) */
+    /* 6. カテゴリ数が少なく上限に達して埋まりきらない場合は、上限を外して残りを埋める
+       (問題バンクが少数カテゴリに偏っている間の救済措置。カテゴリが増えれば発生しにくくなる。
+       ソート済みのunansweredを再利用し、優先レベル順を維持したまま埋める) */
     if (remaining > 0) {
-      var leftoverUnanswered = questions.filter(function (q) {
-        return !usedIds[q.id] && !progress.questionStats[q.id];
-      });
+      var leftoverUnanswered = unanswered.filter(function (q) { return !usedIds[q.id]; });
       remaining = pickIntoNoCap(newPicks, leftoverUnanswered, remaining, usedIds);
     }
     if (remaining > 0) {
@@ -1142,7 +1145,11 @@
     startQuiz(pool);
   });
 
-  document.getElementById("daily-complete-back-btn").addEventListener("click", function () {
+  function bindBackButton(id, action) {
+    document.getElementById(id).addEventListener("click", action);
+  }
+
+  bindBackButton("daily-complete-back-btn", function () {
     refreshTopScreen();
     show("screen-top");
   });
@@ -1152,12 +1159,12 @@
     show("screen-zukan");
   });
 
-  document.getElementById("zukan-back-btn").addEventListener("click", function () {
+  bindBackButton("zukan-back-btn", function () {
     refreshTopScreen();
     show("screen-top");
   });
 
-  document.getElementById("zukan-detail-back-btn").addEventListener("click", function () {
+  bindBackButton("zukan-detail-back-btn", function () {
     renderZukan();
     show("screen-zukan");
   });
