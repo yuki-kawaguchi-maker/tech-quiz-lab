@@ -67,7 +67,10 @@ def validate_file(path, errors, seen_ids):
 def main():
     errors = []
     seen_ids = set()
-    files = sorted(glob.glob("data/questions/*.json"))
+    files = sorted(
+        p for p in glob.glob("data/questions/*.json")
+        if p != "data/questions/index.json"
+    )
     if not files:
         print("data/questions/*.json が見つからない")
         sys.exit(1)

@@ -18,10 +18,30 @@
 
 ## ディレクトリ構成
 
+- `index.html` — クイズ本体のUI・ロジック(1ファイル完結、外部ライブラリ不使用)
 - `docs/question-schema.md` — 問題データJSONのスキーマ定義(正本)
+- `data/questions/index.json` — 読み込むカテゴリ・ファイルの一覧(マニフェスト)
 - `data/questions/<category>.json` — カテゴリごとの問題データ
-  (現状は `github.json` のサンプル3問のみ)
-- `index.html` — クイズ本体のUI・ロジック(未作成、今後追加予定)
+  (現状は `github.json` の19問のみ)
+- `scripts/validate_questions.py` — 問題データのスキーマ適合チェック
+
+## 使い方(GitHub Pagesで開く)
+
+1. リポジトリの Settings → Pages で、公開元をこのリポジトリの `main` ブランチ
+   (ルートディレクトリ)に設定する。
+2. 公開されたURL(`https://<ユーザー名>.github.io/tech-quiz-lab/`)を開くと、
+   `index.html` が `data/questions/index.json` を起点に問題データを読み込む。
+3. トップ画面でカテゴリ・出題数・出題モード(通常/復習キュー)を選び、「はじめる」を押す。
+4. 4択から1つ選ぶと即座に正誤・解説(key_concept・図解・explanation・
+   各選択肢のwhy_right/why_wrong・practice_note)が表示される。「勘で当てた」を押すと、
+   正解でもその問題を復習キューに入れられる。
+5. 進捗(累計成績・復習キュー)はブラウザのlocalStorageに保存される。端末・ブラウザを
+   変えると引き継がれない点に注意する。トップ画面の「進捗をリセット」でいつでも初期化できる。
+
+**ローカルで動作確認する場合**: `index.html` を`file://`で直接開くとブラウザの
+セキュリティ制限でfetchが失敗するため、リポジトリ直下で
+`python3 -m http.server` 等の簡易HTTPサーバーを起動してから
+`http://localhost:8000/` を開くこと。
 
 ## 問題を追加する手順(バッチ生成1セッション分の型)
 
