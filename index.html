@@ -784,7 +784,7 @@
   }
 
   var DAILY_REVIEW_MAX = 5;
-  var DAILY_NEW_MAX = 15;
+  var DAILY_TOTAL = 20;
   var DAILY_CATEGORY_CAP = 10;
 
   function categoryAccuracy(progress, cat) {
@@ -834,12 +834,16 @@
       }
     });
 
+    /* 1b. 復習が5問に満たない分は新規枠に回し、合計が常に20問になるようにする
+       (問題バンク全体が20問未満の場合を除く) */
+    var newTarget = DAILY_TOTAL - reviewPicks.length;
+
     /* 2. レベル方針: 初級の正答率が80%未満(またはデータ無し)なら初級優先、
-       80%以上なら中級を半分以上混ぜる */
+       80%以上なら中級を半分以上混ぜる(「半分」は新規枠newTarget基準) */
     var lvl1 = progress.byLevel[1];
     var lvl1Acc = (lvl1 && lvl1.answered > 0) ? (lvl1.correct / lvl1.answered) : null;
     var preferLevel1 = lvl1Acc === null || lvl1Acc < 0.8;
-    var minLevel2 = preferLevel1 ? 0 : Math.ceil(DAILY_NEW_MAX / 2);
+    var minLevel2 = preferLevel1 ? 0 : Math.ceil(newTarget / 2);
 
     /* 3. 未出題の候補を、カテゴリの正答率が低い順(未経験カテゴリ優先)に並べる */
     var unanswered = questions.filter(function (q) {
@@ -858,7 +862,7 @@
 
     var newPicks = [];
     var categoryCount = {};
-    var remaining = DAILY_NEW_MAX;
+    var remaining = newTarget;
 
     if (!preferLevel1 && minLevel2 > 0) {
       var level2Candidates = unanswered.filter(function (q) { return q.difficulty === 2; });
