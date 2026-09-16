@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tech Quiz Lab</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1565c0">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
   :root {
     --color-correct: #2e7d32;
@@ -212,12 +216,21 @@
       <h2>累計成績</h2>
       <p id="stats-overall">まだ解答記録がありません。</p>
       <ul id="stats-by-category"></ul>
+      <p id="stats-top-wrong-label" class="quiz-meta" hidden>誤答回数の多い問題 上位5件</p>
+      <ul id="stats-top-wrong"></ul>
     </section>
 
     <form id="setup-form" hidden>
       <fieldset>
         <legend>カテゴリ(複数選択可)</legend>
         <div id="category-checkboxes"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>レベル(複数選択可)</legend>
+        <label><input type="checkbox" name="level" value="1" checked> 初級(用語・図解読み取り)</label>
+        <label><input type="checkbox" name="level" value="2" checked> 中級(状況→操作)</label>
+        <label><input type="checkbox" name="level" value="3" checked> 上級(トラブル対処)</label>
       </fieldset>
 
       <fieldset>
@@ -244,6 +257,7 @@
   <main id="screen-quiz" hidden>
     <p class="quiz-meta" id="quiz-progress"></p>
     <p class="quiz-meta" id="quiz-category"></p>
+    <div class="diagram-box" id="quiz-diagram" hidden></div>
     <p class="question-text" id="quiz-question"></p>
     <div id="quiz-choices"></div>
   </main>
@@ -267,7 +281,7 @@
   var STORAGE_KEY = "tq_progress_v1";
 
   function defaultProgress() {
-    return { totals: { answered: 0, correct: 0 }, byCategory: {}, reviewQueue: [] };
+    return { totals: { answered: 0, correct: 0 }, byCategory: {}, reviewQueue: [], questionStats: {} };
   }
 
   function loadProgress() {
@@ -280,7 +294,8 @@
       return {
         totals: parsed.totals || base.totals,
         byCategory: parsed.byCategory || base.byCategory,
-        reviewQueue: Array.isArray(parsed.reviewQueue) ? parsed.reviewQueue : base.reviewQueue
+        reviewQueue: Array.isArray(parsed.reviewQueue) ? parsed.reviewQueue : base.reviewQueue,
+        questionStats: parsed.questionStats || base.questionStats
       };
     } catch (e) {
       return defaultProgress();
@@ -334,6 +349,41 @@
     });
   }
 
+  function trimDiagram(svgMarkup, keyConcept) {
+    /* key_conceptと同内容のキャプション<text>を取り除き(黄色枠との二重表示解消)、
+       残った要素のbboxに合わせてviewBoxを詰める。データのSVG文字列自体は変更しない。 */
+    var wrapper = document.createElement("div");
+    wrapper.style.position = "absolute";
+    wrapper.style.visibility = "hidden";
+    wrapper.style.pointerEvents = "none";
+    wrapper.style.left = "-9999px";
+    wrapper.innerHTML = svgMarkup;
+    document.body.appendChild(wrapper);
+    try {
+      var svg = wrapper.querySelector("svg");
+      if (!svg) return svgMarkup;
+      var texts = svg.querySelectorAll("text");
+      texts.forEach(function (t) {
+        if (t.textContent.trim() === keyConcept.trim() && t.parentNode) {
+          t.parentNode.removeChild(t);
+        }
+      });
+      try {
+        var bbox = svg.getBBox();
+        var pad = 6;
+        svg.setAttribute(
+          "viewBox",
+          (bbox.x - pad) + " " + (bbox.y - pad) + " " + (bbox.width + pad * 2) + " " + (bbox.height + pad * 2)
+        );
+      } catch (e) {
+        /* getBBoxが使えない環境ではviewBoxをそのまま使う */
+      }
+      return svg.outerHTML;
+    } finally {
+      document.body.removeChild(wrapper);
+    }
+  }
+
   function renderStats() {
     var box = document.getElementById("stats-box");
     var overall = document.getElementById("stats-overall");
@@ -357,6 +407,39 @@
     });
     document.getElementById("review-queue-count").textContent =
       "復習キュー: " + state.progress.reviewQueue.length + "問";
+
+    renderTopWrong();
+  }
+
+  function renderTopWrong() {
+    var label = document.getElementById("stats-top-wrong-label");
+    var listEl = document.getElementById("stats-top-wrong");
+    listEl.innerHTML = "";
+
+    var questionById = {};
+    state.questions.forEach(function (q) { questionById[q.id] = q; });
+
+    var entries = Object.keys(state.progress.questionStats)
+      .map(function (id) {
+        var s = state.progress.questionStats[id];
+        return { id: id, wrong: s.wrong, attempts: s.attempts };
+      })
+      .filter(function (e) { return e.wrong > 0; })
+      .sort(function (a, b) { return b.wrong - a.wrong; })
+      .slice(0, 5);
+
+    if (entries.length === 0) {
+      label.hidden = true;
+      return;
+    }
+    label.hidden = false;
+    entries.forEach(function (e) {
+      var q = questionById[e.id];
+      var li = document.createElement("li");
+      var kc = q ? q.key_concept : "(問題データ未読み込み)";
+      li.textContent = e.id + ": " + kc + "(誤答" + e.wrong + "回 / 出題" + e.attempts + "回)";
+      listEl.appendChild(li);
+    });
   }
 
   function renderCategoryCheckboxes() {
@@ -383,13 +466,21 @@
     return result;
   }
 
+  function getSelectedLevels() {
+    var boxes = document.querySelectorAll('input[name="level"]:checked');
+    var result = [];
+    boxes.forEach(function (b) { result.push(parseInt(b.value, 10)); });
+    return result;
+  }
+
   function buildPool() {
     var selectedCats = getSelectedCategories();
+    var selectedLevels = getSelectedLevels();
     var reviewMode = document.getElementById("review-toggle").checked;
     var countValue = document.getElementById("count-select").value;
 
     var candidates = state.questions.filter(function (q) {
-      return selectedCats.indexOf(q.category) !== -1;
+      return selectedCats.indexOf(q.category) !== -1 && selectedLevels.indexOf(q.difficulty) !== -1;
     });
 
     if (reviewMode) {
@@ -429,6 +520,16 @@
       (state.poolIndex + 1) + " / " + state.pool.length + "問";
     document.getElementById("quiz-category").textContent =
       state.current.category + " ・ " + state.current.subtopic;
+
+    var quizDiagram = document.getElementById("quiz-diagram");
+    if (state.current.question_type === "diagram_read") {
+      quizDiagram.innerHTML = trimDiagram(state.current.diagram, state.current.key_concept);
+      quizDiagram.hidden = false;
+    } else {
+      quizDiagram.innerHTML = "";
+      quizDiagram.hidden = true;
+    }
+
     document.getElementById("quiz-question").textContent = state.current.question;
 
     var labels = ["A", "B", "C", "D"];
@@ -476,11 +577,19 @@
     p.byCategory[q.category].answered += 1;
     if (isCorrect) p.byCategory[q.category].correct += 1;
 
-    if (!isCorrect) {
+    if (!p.questionStats[q.id]) {
+      p.questionStats[q.id] = { attempts: 0, wrong: 0 };
+    }
+    p.questionStats[q.id].attempts += 1;
+    if (!isCorrect) p.questionStats[q.id].wrong += 1;
+
+    if (isCorrect) {
+      /* 正解確定時点で即座にキューから外す。この後「勘で当てた」が押されれば
+         guessed-btnのハンドラで即座にキューへ戻す(上書き)。 */
+      removeFromReviewQueue(q.id);
+    } else {
       addToReviewQueue(q.id);
     }
-    /* 正解時のキュー除去は「勘で当てた」の押下有無を確定できる
-       次の問題へ進むタイミングで行う(finalizeReviewQueue参照) */
 
     var saved = saveProgress(p);
     showSaveWarningIfNeeded(saved);
@@ -499,20 +608,6 @@
     }
   }
 
-  function finalizeReviewQueue(q, isCorrect) {
-    if (isCorrect) {
-      if (state.guessedPressed) {
-        addToReviewQueue(q.id);
-      } else {
-        removeFromReviewQueue(q.id);
-      }
-    }
-    /* 誤答時はupdateProgressOnAnswerで既にキューに追加済み。
-       誤答かつ「勘で当てた」押下時も、既にキュー入り済みのため変化なし */
-    var saved = saveProgress(state.progress);
-    showSaveWarningIfNeeded(saved);
-  }
-
   function showSaveWarningIfNeeded(saved) {
     var el = document.getElementById("start-error");
     if (!saved) {
@@ -527,7 +622,7 @@
     banner.className = "result-banner " + (isCorrect ? "correct" : "wrong");
 
     document.getElementById("result-key-concept").textContent = q.key_concept;
-    document.getElementById("result-diagram").innerHTML = q.diagram;
+    document.getElementById("result-diagram").innerHTML = trimDiagram(q.diagram, q.key_concept);
     document.getElementById("result-explanation").textContent = q.explanation;
     document.getElementById("result-practice-note").textContent = q.practice_note;
 
@@ -570,10 +665,8 @@
   });
 
   document.getElementById("next-btn").addEventListener("click", function () {
-    var q = state.current;
-    var isCorrect = state.selectedIndex === q.answer_index;
-    finalizeReviewQueue(q, isCorrect);
-
+    /* 復習キューの増減は解答確定時・guessed-btn押下時に即保存済みのため、
+       ここでは次の問題へ進むだけでよい */
     state.poolIndex += 1;
     if (state.poolIndex >= state.pool.length) {
       renderStats();
@@ -630,7 +723,16 @@
       });
   }
 
+  function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.register("sw.js").catch(function (err) {
+      /* 登録に失敗しても画面は通常どおり動作させる(オフライン対応が効かないだけ) */
+      console.warn("service worker registration failed", err);
+    });
+  }
+
   init();
+  registerServiceWorker();
 })();
 </script>
 </body>
