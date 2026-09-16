@@ -1,7 +1,7 @@
 /* Tech Quiz Lab service worker */
 "use strict";
 
-var CACHE_VERSION = "tq-cache-v4";
+var CACHE_VERSION = "tq-cache-v5";
 
 var PRECACHE_URLS = [
   "./",
@@ -33,8 +33,28 @@ self.addEventListener("activate", function (event) {
   self.clients.claim();
 });
 
-function isQuestionDataRequest(url) {
+function isNetworkFirstDataRequest(url) {
   return url.pathname.indexOf("/data/questions/") !== -1 || url.pathname.indexOf("/data/lessons/") !== -1;
+}
+
+function isAppShellRequest(url) {
+  return url.pathname.slice(-1) === "/"
+    || /\/index\.html$/.test(url.pathname)
+    || /\/manifest\.json$/.test(url.pathname);
+}
+
+function networkFirst(event) {
+  event.respondWith(
+    fetch(event.request)
+      .then(function (response) {
+        var copy = response.clone();
+        caches.open(CACHE_VERSION).then(function (cache) { cache.put(event.request, copy); });
+        return response;
+      })
+      .catch(function () {
+        return caches.match(event.request);
+      })
+  );
 }
 
 self.addEventListener("fetch", function (event) {
@@ -43,23 +63,20 @@ self.addEventListener("fetch", function (event) {
     return;
   }
 
-  if (isQuestionDataRequest(url)) {
-    /* 問題データはnetwork-first: 最新データを優先し、取得失敗時はキャッシュにフォールバック */
-    event.respondWith(
-      fetch(event.request)
-        .then(function (response) {
-          var copy = response.clone();
-          caches.open(CACHE_VERSION).then(function (cache) { cache.put(event.request, copy); });
-          return response;
-        })
-        .catch(function () {
-          return caches.match(event.request);
-        })
-    );
+  if (isNetworkFirstDataRequest(url)) {
+    /* 問題データ・レッスンデータはnetwork-first: 最新データを優先し、取得失敗時はキャッシュにフォールバック */
+    networkFirst(event);
     return;
   }
 
-  /* それ以外(index.html・manifest.json・icons等)はcache-first */
+  if (isAppShellRequest(url)) {
+    /* index.html・manifest.jsonはnetwork-first: デプロイ直後の初回起動から新版を反映する
+       (cache-firstだと1回目の起動は旧版のまま表示されてしまうため) */
+    networkFirst(event);
+    return;
+  }
+
+  /* それ以外(icons等)はcache-first */
   event.respondWith(
     caches.match(event.request).then(function (cached) {
       if (cached) return cached;

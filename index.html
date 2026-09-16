@@ -304,10 +304,29 @@
   .textbook-unit-item.learned {
     border-color: var(--color-correct);
   }
+  #update-banner {
+    background: var(--color-active);
+    color: #fff;
+    text-align: center;
+    padding: 8px 12px;
+  }
+  #update-banner-btn {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    padding: 4px;
+    margin: 0;
+    cursor: pointer;
+  }
   [hidden] { display: none !important; }
 </style>
 </head>
 <body>
+<div id="update-banner" hidden>
+  <button type="button" id="update-banner-btn">新しい版があります。更新する</button>
+</div>
 <div id="app">
   <h1>Tech Quiz Lab</h1>
 
@@ -1629,13 +1648,69 @@
       });
   }
 
+  function showUpdateBanner() {
+    try {
+      document.getElementById("update-banner").hidden = false;
+    } catch (e) {
+      /* バナー表示に失敗しても通常どおり動作させる */
+    }
+  }
+
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return;
-    navigator.serviceWorker.register("sw.js").catch(function (err) {
-      /* 登録に失敗しても画面は通常どおり動作させる(オフライン対応が効かないだけ) */
-      console.warn("service worker registration failed", err);
-    });
+
+    try {
+      /* 初回訪問でservice workerが初めてページを制御した場合は「更新」ではないため
+         最初の1回だけ無視し、2回目以降のcontrollerchangeを新版への切り替えとして扱う */
+      var initialControllerPresent = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        if (!initialControllerPresent) {
+          initialControllerPresent = true;
+          return;
+        }
+        showUpdateBanner();
+      });
+    } catch (e) {
+      /* 監視の設定に失敗しても通常どおり動作させる */
+    }
+
+    try {
+      navigator.serviceWorker.register("sw.js")
+        .then(function (registration) {
+          try {
+            registration.addEventListener("updatefound", function () {
+              /* 新版のインストールを検知(ログ・診断用)。実際の画面切り替え検知・
+                 バナー表示はcontrollerchangeで行う(skipWaiting+clients.claimにより
+                 インストール完了後すぐ有効化されるため) */
+            });
+          } catch (e) {
+            /* 監視の設定に失敗しても通常どおり動作させる */
+          }
+        })
+        .catch(function (err) {
+          /* 登録に失敗しても画面は通常どおり動作させる(オフライン対応が効かないだけ) */
+          console.warn("service worker registration failed", err);
+        });
+    } catch (e) {
+      /* 登録処理自体が失敗しても通常どおり動作させる */
+    }
+
+    try {
+      navigator.serviceWorker.getRegistration().then(function (registration) {
+        if (registration) registration.update();
+      });
+    } catch (e) {
+      /* 更新チェックに失敗しても通常どおり動作させる */
+    }
   }
+
+  document.getElementById("update-banner-btn").addEventListener("click", function () {
+    try {
+      location.reload();
+    } catch (e) {
+      /* リロードに失敗しても何もしない */
+    }
+  });
 
   init();
   registerServiceWorker();
