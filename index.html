@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tech Quiz Lab</title>
+<style>
+  :root {
+    --color-correct: #2e7d32;
+    --color-wrong: #c62828;
+    --color-active: #1565c0;
+    --color-muted: #757575;
+    --color-accent: #fbc02d;
+    --color-text: #1a1a1a;
+    --color-bg: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 12px 16px 40px;
+  }
+  h1 {
+    font-size: 1.25rem;
+    margin: 8px 0 16px;
+  }
+  h2 {
+    font-size: 1.05rem;
+    margin: 0 0 10px;
+  }
+  section {
+    margin-bottom: 20px;
+  }
+  fieldset {
+    border: 1px solid rgba(117, 117, 117, 0.4);
+    border-radius: 8px;
+    margin: 0 0 16px;
+    padding: 10px 12px;
+  }
+  legend {
+    font-weight: bold;
+    padding: 0 4px;
+  }
+  label {
+    display: block;
+    padding: 4px 0;
+  }
+  label input {
+    margin-right: 8px;
+  }
+  select {
+    font-size: 1rem;
+    padding: 6px;
+    width: 100%;
+  }
+  button {
+    font-size: 1rem;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(117, 117, 117, 0.4);
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    width: 100%;
+    margin-top: 8px;
+  }
+  button.primary {
+    background: var(--color-active);
+    border-color: var(--color-active);
+    color: #fff;
+    font-weight: bold;
+  }
+  button.secondary-muted {
+    color: var(--color-muted);
+    border-color: rgba(117, 117, 117, 0.4);
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  #stats-box {
+    border: 1px solid rgba(117, 117, 117, 0.4);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+  }
+  #stats-box p {
+    margin: 4px 0;
+  }
+  #stats-by-category {
+    margin: 6px 0 0;
+    padding-left: 18px;
+  }
+  #stats-by-category li {
+    margin: 2px 0;
+  }
+  .quiz-meta {
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+  .question-text {
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+  }
+  .choice-btn {
+    text-align: left;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    white-space: normal;
+  }
+  .choice-btn .choice-label {
+    flex: 0 0 auto;
+    font-weight: bold;
+    color: var(--color-active);
+  }
+  .choice-btn:hover {
+    border-color: var(--color-active);
+  }
+  .result-banner {
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+  .result-banner.correct { background: var(--color-correct); }
+  .result-banner.wrong { background: var(--color-wrong); }
+  .key-concept-box {
+    background: rgba(251, 192, 45, 0.25);
+    border: 1px solid var(--color-accent);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    font-weight: bold;
+  }
+  .diagram-box {
+    margin-bottom: 16px;
+  }
+  .diagram-box svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  .explanation-box {
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+  }
+  .choices-review {
+    margin-bottom: 16px;
+  }
+  .choice-review-item {
+    border: 1px solid rgba(117, 117, 117, 0.4);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+  .choice-review-item.is-correct-answer {
+    border-color: var(--color-correct);
+    background: rgba(46, 125, 50, 0.08);
+  }
+  .choice-review-item.is-user-wrong-pick {
+    border-color: var(--color-wrong);
+    background: rgba(198, 40, 40, 0.08);
+  }
+  .choice-review-item .choice-review-text {
+    font-weight: bold;
+  }
+  .choice-review-item .choice-review-why {
+    margin-top: 4px;
+    font-size: 0.95rem;
+  }
+  .practice-note-box {
+    border-left: 3px solid var(--color-muted);
+    padding-left: 10px;
+    color: var(--color-muted);
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+  }
+  .save-warning {
+    color: var(--color-wrong);
+    font-size: 0.85rem;
+    margin: 4px 0;
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Tech Quiz Lab</h1>
+
+  <main id="screen-top">
+    <p id="loading-message">問題データを読み込み中...</p>
+
+    <section id="stats-box" hidden>
+      <h2>累計成績</h2>
+      <p id="stats-overall">まだ解答記録がありません。</p>
+      <ul id="stats-by-category"></ul>
+    </section>
+
+    <form id="setup-form" hidden>
+      <fieldset>
+        <legend>カテゴリ(複数選択可)</legend>
+        <div id="category-checkboxes"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>出題数</legend>
+        <select id="count-select">
+          <option value="10">10問</option>
+          <option value="20">20問</option>
+          <option value="all">全部</option>
+        </select>
+      </fieldset>
+
+      <fieldset>
+        <legend>出題モード</legend>
+        <label><input type="checkbox" id="review-toggle"> 復習キューから出す(誤答・「勘で当てた」問題)</label>
+        <p id="review-queue-count" class="quiz-meta"></p>
+      </fieldset>
+
+      <button type="submit" class="primary" id="start-btn">はじめる</button>
+      <button type="button" id="reset-btn" class="secondary-muted">進捗をリセット</button>
+      <p id="start-error" class="save-warning" hidden></p>
+    </form>
+  </main>
+
+  <main id="screen-quiz" hidden>
+    <p class="quiz-meta" id="quiz-progress"></p>
+    <p class="quiz-meta" id="quiz-category"></p>
+    <p class="question-text" id="quiz-question"></p>
+    <div id="quiz-choices"></div>
+  </main>
+
+  <main id="screen-result" hidden>
+    <p class="result-banner" id="result-banner"></p>
+    <div class="key-concept-box" id="result-key-concept"></div>
+    <div class="diagram-box" id="result-diagram"></div>
+    <div class="explanation-box" id="result-explanation"></div>
+    <div class="choices-review" id="result-choices"></div>
+    <div class="practice-note-box" id="result-practice-note"></div>
+    <button type="button" id="guessed-btn">勘で当てた(復習キューに入れる)</button>
+    <button type="button" id="next-btn" class="primary">次の問題へ</button>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "tq_progress_v1";
+
+  function defaultProgress() {
+    return { totals: { answered: 0, correct: 0 }, byCategory: {}, reviewQueue: [] };
+  }
+
+  function loadProgress() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return defaultProgress();
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return defaultProgress();
+      var base = defaultProgress();
+      return {
+        totals: parsed.totals || base.totals,
+        byCategory: parsed.byCategory || base.byCategory,
+        reviewQueue: Array.isArray(parsed.reviewQueue) ? parsed.reviewQueue : base.reviewQueue
+      };
+    } catch (e) {
+      return defaultProgress();
+    }
+  }
+
+  function saveProgress(progress) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function clearProgress() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {
+      /* localStorageが使えない環境でも無視して続行する */
+    }
+  }
+
+  var state = {
+    questions: [],
+    categories: [],
+    progress: loadProgress(),
+    pool: [],
+    poolIndex: 0,
+    current: null,
+    shuffledChoices: [],
+    answered: false,
+    selectedIndex: null,
+    guessedPressed: false
+  };
+
+  function shuffle(array) {
+    var a = array.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  function show(id) {
+    ["screen-top", "screen-quiz", "screen-result"].forEach(function (s) {
+      document.getElementById(s).hidden = s !== id;
+    });
+  }
+
+  function renderStats() {
+    var box = document.getElementById("stats-box");
+    var overall = document.getElementById("stats-overall");
+    var byCatEl = document.getElementById("stats-by-category");
+    var totals = state.progress.totals;
+    box.hidden = false;
+    if (totals.answered === 0) {
+      overall.textContent = "まだ解答記録がありません。";
+    } else {
+      var pct = Math.round((totals.correct / totals.answered) * 100);
+      overall.textContent = "正答率: " + pct + "%(" + totals.correct + " / " + totals.answered + "問)";
+    }
+    byCatEl.innerHTML = "";
+    Object.keys(state.progress.byCategory).forEach(function (cat) {
+      var c = state.progress.byCategory[cat];
+      if (!c || c.answered === 0) return;
+      var pct = Math.round((c.correct / c.answered) * 100);
+      var li = document.createElement("li");
+      li.textContent = cat + ": " + pct + "%(" + c.correct + " / " + c.answered + "問)";
+      byCatEl.appendChild(li);
+    });
+    document.getElementById("review-queue-count").textContent =
+      "復習キュー: " + state.progress.reviewQueue.length + "問";
+  }
+
+  function renderCategoryCheckboxes() {
+    var container = document.getElementById("category-checkboxes");
+    container.innerHTML = "";
+    state.categories.forEach(function (cat, idx) {
+      var label = document.createElement("label");
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.name = "category";
+      input.value = cat;
+      input.checked = true;
+      input.id = "cat-" + idx;
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(cat));
+      container.appendChild(label);
+    });
+  }
+
+  function getSelectedCategories() {
+    var boxes = document.querySelectorAll('input[name="category"]:checked');
+    var result = [];
+    boxes.forEach(function (b) { result.push(b.value); });
+    return result;
+  }
+
+  function buildPool() {
+    var selectedCats = getSelectedCategories();
+    var reviewMode = document.getElementById("review-toggle").checked;
+    var countValue = document.getElementById("count-select").value;
+
+    var candidates = state.questions.filter(function (q) {
+      return selectedCats.indexOf(q.category) !== -1;
+    });
+
+    if (reviewMode) {
+      var queueSet = {};
+      state.progress.reviewQueue.forEach(function (id) { queueSet[id] = true; });
+      candidates = candidates.filter(function (q) { return queueSet[q.id]; });
+    }
+
+    candidates = shuffle(candidates);
+
+    if (countValue !== "all") {
+      var n = parseInt(countValue, 10);
+      candidates = candidates.slice(0, n);
+    }
+
+    return candidates;
+  }
+
+  function startQuiz(pool) {
+    state.pool = pool;
+    state.poolIndex = 0;
+    showQuestion();
+  }
+
+  function showQuestion() {
+    state.current = state.pool[state.poolIndex];
+    state.answered = false;
+    state.selectedIndex = null;
+    state.guessedPressed = false;
+
+    var choicesWithIndex = state.current.choices.map(function (c, i) {
+      return { choice: c, originalIndex: i };
+    });
+    state.shuffledChoices = shuffle(choicesWithIndex);
+
+    document.getElementById("quiz-progress").textContent =
+      (state.poolIndex + 1) + " / " + state.pool.length + "問";
+    document.getElementById("quiz-category").textContent =
+      state.current.category + " ・ " + state.current.subtopic;
+    document.getElementById("quiz-question").textContent = state.current.question;
+
+    var labels = ["A", "B", "C", "D"];
+    var container = document.getElementById("quiz-choices");
+    container.innerHTML = "";
+    state.shuffledChoices.forEach(function (entry, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice-btn";
+      var labelSpan = document.createElement("span");
+      labelSpan.className = "choice-label";
+      labelSpan.textContent = labels[i] + ".";
+      var textSpan = document.createElement("span");
+      textSpan.textContent = entry.choice.text;
+      btn.appendChild(labelSpan);
+      btn.appendChild(textSpan);
+      btn.addEventListener("click", function () { onAnswer(entry.originalIndex); });
+      container.appendChild(btn);
+    });
+
+    show("screen-quiz");
+  }
+
+  function onAnswer(originalIndex) {
+    if (state.answered) return;
+    state.answered = true;
+    state.selectedIndex = originalIndex;
+
+    var q = state.current;
+    var isCorrect = originalIndex === q.answer_index;
+
+    updateProgressOnAnswer(q, isCorrect);
+    renderResult(q, isCorrect, originalIndex);
+    show("screen-result");
+  }
+
+  function updateProgressOnAnswer(q, isCorrect) {
+    var p = state.progress;
+    p.totals.answered += 1;
+    if (isCorrect) p.totals.correct += 1;
+
+    if (!p.byCategory[q.category]) {
+      p.byCategory[q.category] = { answered: 0, correct: 0 };
+    }
+    p.byCategory[q.category].answered += 1;
+    if (isCorrect) p.byCategory[q.category].correct += 1;
+
+    if (!isCorrect) {
+      addToReviewQueue(q.id);
+    }
+    /* 正解時のキュー除去は「勘で当てた」の押下有無を確定できる
+       次の問題へ進むタイミングで行う(finalizeReviewQueue参照) */
+
+    var saved = saveProgress(p);
+    showSaveWarningIfNeeded(saved);
+  }
+
+  function addToReviewQueue(id) {
+    if (state.progress.reviewQueue.indexOf(id) === -1) {
+      state.progress.reviewQueue.push(id);
+    }
+  }
+
+  function removeFromReviewQueue(id) {
+    var idx = state.progress.reviewQueue.indexOf(id);
+    if (idx !== -1) {
+      state.progress.reviewQueue.splice(idx, 1);
+    }
+  }
+
+  function finalizeReviewQueue(q, isCorrect) {
+    if (isCorrect) {
+      if (state.guessedPressed) {
+        addToReviewQueue(q.id);
+      } else {
+        removeFromReviewQueue(q.id);
+      }
+    }
+    /* 誤答時はupdateProgressOnAnswerで既にキューに追加済み。
+       誤答かつ「勘で当てた」押下時も、既にキュー入り済みのため変化なし */
+    var saved = saveProgress(state.progress);
+    showSaveWarningIfNeeded(saved);
+  }
+
+  function showSaveWarningIfNeeded(saved) {
+    var el = document.getElementById("start-error");
+    if (!saved) {
+      el.hidden = false;
+      el.textContent = "進捗の保存に失敗しました(このブラウザではlocalStorageが使えない可能性があります)。このセッション中は引き続き利用できます。";
+    }
+  }
+
+  function renderResult(q, isCorrect, selectedOriginalIndex) {
+    var banner = document.getElementById("result-banner");
+    banner.textContent = isCorrect ? "正解" : "不正解";
+    banner.className = "result-banner " + (isCorrect ? "correct" : "wrong");
+
+    document.getElementById("result-key-concept").textContent = q.key_concept;
+    document.getElementById("result-diagram").innerHTML = q.diagram;
+    document.getElementById("result-explanation").textContent = q.explanation;
+    document.getElementById("result-practice-note").textContent = q.practice_note;
+
+    var reviewContainer = document.getElementById("result-choices");
+    reviewContainer.innerHTML = "";
+    var labels = ["A", "B", "C", "D"];
+    state.shuffledChoices.forEach(function (entry, i) {
+      var item = document.createElement("div");
+      item.className = "choice-review-item";
+      var isAnswer = entry.originalIndex === q.answer_index;
+      var isUserPick = entry.originalIndex === selectedOriginalIndex;
+      if (isAnswer) item.classList.add("is-correct-answer");
+      if (isUserPick && !isAnswer) item.classList.add("is-user-wrong-pick");
+
+      var textEl = document.createElement("div");
+      textEl.className = "choice-review-text";
+      textEl.textContent = labels[i] + ". " + entry.choice.text + (isUserPick ? "(選択)" : "");
+      item.appendChild(textEl);
+
+      var whyEl = document.createElement("div");
+      whyEl.className = "choice-review-why";
+      whyEl.textContent = isAnswer ? entry.choice.why_right : entry.choice.why_wrong;
+      item.appendChild(whyEl);
+
+      reviewContainer.appendChild(item);
+    });
+
+    var guessedBtn = document.getElementById("guessed-btn");
+    guessedBtn.disabled = false;
+    guessedBtn.textContent = "勘で当てた(復習キューに入れる)";
+  }
+
+  document.getElementById("guessed-btn").addEventListener("click", function () {
+    state.guessedPressed = true;
+    addToReviewQueue(state.current.id);
+    saveProgress(state.progress);
+    var guessedBtn = document.getElementById("guessed-btn");
+    guessedBtn.disabled = true;
+    guessedBtn.textContent = "復習キューに入れました";
+  });
+
+  document.getElementById("next-btn").addEventListener("click", function () {
+    var q = state.current;
+    var isCorrect = state.selectedIndex === q.answer_index;
+    finalizeReviewQueue(q, isCorrect);
+
+    state.poolIndex += 1;
+    if (state.poolIndex >= state.pool.length) {
+      renderStats();
+      show("screen-top");
+    } else {
+      showQuestion();
+    }
+  });
+
+  document.getElementById("setup-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var errorEl = document.getElementById("start-error");
+    errorEl.hidden = true;
+
+    var pool = buildPool();
+    if (pool.length === 0) {
+      errorEl.hidden = false;
+      errorEl.textContent = "条件に合う問題がありません(カテゴリ・復習キューの設定を見直してください)。";
+      return;
+    }
+    startQuiz(pool);
+  });
+
+  document.getElementById("reset-btn").addEventListener("click", function () {
+    if (!window.confirm("進捗(成績・復習キュー)をすべてリセットします。よろしいですか?")) {
+      return;
+    }
+    clearProgress();
+    state.progress = defaultProgress();
+    renderStats();
+  });
+
+  function init() {
+    fetch("data/questions/index.json")
+      .then(function (res) { return res.json(); })
+      .then(function (manifest) {
+        state.categories = manifest.map(function (m) { return m.category; });
+        return Promise.all(
+          manifest.map(function (m) {
+            return fetch("data/questions/" + m.file).then(function (res) { return res.json(); });
+          })
+        );
+      })
+      .then(function (fileResults) {
+        state.questions = [].concat.apply([], fileResults);
+        document.getElementById("loading-message").hidden = true;
+        renderCategoryCheckboxes();
+        renderStats();
+        document.getElementById("setup-form").hidden = false;
+      })
+      .catch(function (err) {
+        document.getElementById("loading-message").textContent =
+          "問題データの読み込みに失敗しました(" + err.message + ")。ネットワーク接続、またはローカルサーバー経由で開いているかを確認してください。";
+      });
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
