@@ -7,7 +7,8 @@
 - カテゴリ: (1) GitHub (2) Salesforce構築の裏側 (3) AIの理解と活用 (4) AI DXコンサル実務
 - 1問ごとに「正解の理由」と「他の3選択肢がなぜ違うか」を必ず解説する。誤答の選択肢は
   「惜しい・混同しやすい概念」で構成する。
-- 解説には静止SVGの図解を1枚添える(「箱2〜3個+矢印+ラベル+ひと言キャプション」の型に限定)。
+- 解説には静止SVGの図解を1枚添える(箱2〜3個・矢印1〜3本・矢印ラベル3個以内・
+  キャプション1文の型に限定。配置パターンは自由)。
 - スマホのブラウザ(幅380pxで破綻しないこと)を主対象に、GitHub Pagesで配信する
   1枚HTML+問題データJSON構成。外部ライブラリ・APIキーは使用しない。
 - 問題はあらかじめバッチ生成して同梱する(実行時生成はしない)。
@@ -19,7 +20,11 @@
 ## ディレクトリ構成
 
 - `index.html` — クイズ本体のUI・ロジック(1ファイル完結、外部ライブラリ不使用)
+- `manifest.json` — PWA用マニフェスト(ホーム画面に追加した際の名前・アイコン・表示形式)
+- `sw.js` — Service Worker(オフライン対応のキャッシュ制御)
+- `icons/` — PWAアイコン(自作SVGから生成した192px・512pxのPNG)
 - `docs/question-schema.md` — 問題データJSONのスキーマ定義(正本)
+- `docs/screenshots/` — 動作確認用スクリーンショット(PR記録用)
 - `data/questions/index.json` — 読み込むカテゴリ・ファイルの一覧(マニフェスト)
 - `data/questions/<category>.json` — カテゴリごとの問題データ
   (現状は `github.json` の19問のみ)
@@ -31,7 +36,8 @@
    (ルートディレクトリ)に設定する。
 2. 公開されたURL(`https://<ユーザー名>.github.io/tech-quiz-lab/`)を開くと、
    `index.html` が `data/questions/index.json` を起点に問題データを読み込む。
-3. トップ画面でカテゴリ・出題数・出題モード(通常/復習キュー)を選び、「はじめる」を押す。
+3. トップ画面でカテゴリ・レベル(初級/中級/上級)・出題数・出題モード(通常/復習キュー)を
+   選び、「はじめる」を押す。
 4. 4択から1つ選ぶと即座に正誤・解説(key_concept・図解・explanation・
    各選択肢のwhy_right/why_wrong・practice_note)が表示される。「勘で当てた」を押すと、
    正解でもその問題を復習キューに入れられる。
@@ -43,21 +49,41 @@
 `python3 -m http.server` 等の簡易HTTPサーバーを起動してから
 `http://localhost:8000/` を開くこと。
 
+## ホーム画面に追加(PWA)
+
+このアプリはPWA(Progressive Web App)対応で、ホーム画面に追加するとオフラインでも
+起動できる(問題データを一度取得済みであれば、通信できない状態でもアプリと問題を開ける)。
+
+- **iOS Safari**: GitHub PagesのURLをSafariで開く → 共有ボタン(四角から矢印が
+  上に伸びるアイコン)をタップ → 「ホーム画面に追加」を選ぶ → 名前を確認して「追加」。
+- **Android Chrome**: GitHub PagesのURLをChromeで開く → 右上のメニュー(縦三点)を
+  タップ → 「アプリをインストール」または「ホーム画面に追加」を選ぶ → 「インストール」。
+
+ホーム画面のアイコンから起動すると、ブラウザのアドレスバー等が無い専用アプリのような
+画面(`display: standalone`)で開く。Service Worker(`sw.js`)がindex.html・
+manifest.json・アイコンをキャッシュし、問題データ(`data/questions/*.json`)は
+オンライン時に最新を取得しつつオフライン時は直近のキャッシュを使う。
+
 ## 問題を追加する手順(バッチ生成1セッション分の型)
 
 新しいカテゴリ、または既存カテゴリへの追加問題をバッチ生成するときは、次の順で進める。
 
 1. **スキーマを確認する**: `docs/question-schema.md` を読み、フィールド構成
-   (`id`/`category`/`subtopic`/`key_concept`/`question`/`choices`/`answer_index`/
-   `explanation`/`diagram`/`practice_note`/`difficulty`、いずれも必須)を守る。
+   (`id`/`category`/`subtopic`/`question_type`/`key_concept`/`question`/`choices`/
+   `answer_index`/`explanation`/`diagram`/`practice_note`/`difficulty`、いずれも必須)を守る。
+   `difficulty`は1=初級(用語・図解読み取り)/2=中級(状況→操作)/3=上級(トラブル対処)、
+   `question_type`は`term`/`diagram_read`/`scenario`/`troubleshoot`のいずれか。
+   `explanation`・`why_right`・`why_wrong`・`practice_note`にバッククォートを使わない。
    スキーマ自体の変更が必要な場合は、データ作成より先に `docs/question-schema.md` を改訂する。
 2. **出題対象を決める**: 対象カテゴリと小分類(`subtopic`)の範囲、目標問題数を決める。
    既存の `id`(`<category>-NNN`)と重複しないよう、採番を確認する。
 3. **問題を作成する**: 1問ごとに、正解の選択肢には `why_right`、誤答の選択肢
    (3件)には `why_wrong` を必ず書く。誤答の選択肢は「明らかに違う」ものではなく
    「惜しい・混同しやすい概念」にする。
-4. **SVG図解を作る**: 各問1枚、「箱2〜3個+矢印+ラベル+ひと言キャプション」の型を守り、
-   要素を増やさない。既存問題(`data/questions/github.json`)のSVGを参考にする。
+4. **SVG図解を作る**: 各問1枚、「箱2〜3個(箱の名前はラベルに数えない)・矢印1〜3本・
+   矢印ラベル3個以内・キャプション1文」の型を守り、要素を増やさない。配置パターン
+   (横並び・収束型・縦積み等)は概念に合わせて自由に選んでよい。既存問題
+   (`data/questions/github.json`)のSVGを参考にする。
 5. **バリデーションする**: 追加後、`python3 scripts/validate_questions.py` を実行し、
    `docs/question-schema.md` の各条件(必須フィールド・choices件数・answer_indexの整合・
    why_right/why_wrongの排他・key_conceptの文字数とキャプション一致・diagramの箱/矢印数等)を

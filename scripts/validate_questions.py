@@ -9,9 +9,14 @@ import json
 import sys
 
 REQUIRED_FIELDS = [
-    "id", "category", "subtopic", "key_concept", "question", "choices",
+    "id", "category", "subtopic", "question_type", "key_concept", "question", "choices",
     "answer_index", "explanation", "diagram", "practice_note", "difficulty",
 ]
+
+VALID_QUESTION_TYPES = {"term", "diagram_read", "scenario", "troubleshoot"}
+
+NO_BACKTICK_FIELDS = ["explanation", "practice_note"]
+NO_BACKTICK_CHOICE_FIELDS = ["why_right", "why_wrong"]
 
 
 def validate_file(path, errors, seen_ids):
@@ -29,6 +34,11 @@ def validate_file(path, errors, seen_ids):
             if q["id"] in seen_ids:
                 errors.append(f"{path}:{qid}: idが重複している")
             seen_ids.add(q["id"])
+        if "question_type" in q and q["question_type"] not in VALID_QUESTION_TYPES:
+            errors.append(f"{path}:{qid}: question_typeが不正な値({q['question_type']!r})")
+        for field in NO_BACKTICK_FIELDS:
+            if field in q and "`" in q[field]:
+                errors.append(f"{path}:{qid}: {field}にバッククォートが含まれている")
         if "key_concept" in q and len(q["key_concept"]) > 40:
             errors.append(f"{path}:{qid}: key_conceptが40字を超えている({len(q['key_concept'])}字)")
         if "key_concept" in q and "diagram" in q and q["key_concept"] not in q["diagram"]:
@@ -48,6 +58,9 @@ def validate_file(path, errors, seen_ids):
                         errors.append(f"{path}:{qid}: answer_indexが指す選択肢にwhy_rightが無い")
                     if i != ai and not has_wrong:
                         errors.append(f"{path}:{qid}: 誤答の選択肢にwhy_wrongが無い")
+                for field in NO_BACKTICK_CHOICE_FIELDS:
+                    if field in c and "`" in c[field]:
+                        errors.append(f"{path}:{qid}: choices[{i}].{field}にバッククォートが含まれている")
         if "answer_index" in q and not (0 <= q["answer_index"] <= 3):
             errors.append(f"{path}:{qid}: answer_indexが0〜3の範囲外")
         if "difficulty" in q and not (1 <= q["difficulty"] <= 3):
